@@ -98,16 +98,19 @@
         
         <div class="form-group" style="margin-bottom: 16px;">
           <label for="login-pin">비밀번호 (PIN)</label>
-          <input type="password" id="login-pin" class="form-input" placeholder="비밀번호 4자리" required>
+          <input type="password" id="login-pin" class="form-input" placeholder="비밀번호" required>
         </div>
         
         <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 12px;">
-          마들 입주하기 🔑
+          마을 입주하기 🔑
         </button>
       </form>
 
-      <div style="margin-top:8px; font-size:0.8rem; color:var(--text-muted);">
-        * 데모 테스트 계정: student1 / 1234, student2 / 1234, teacher / 0000
+      <div style="margin-top:16px; text-align:center; border-top: 2px dashed #e2e8f0; padding-top:16px;">
+        <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px;">처음 오셨나요? 선생님께 초대코드를 받아 가입하세요!</p>
+        <button onclick="window.location.hash='#signup'" class="btn btn-accent" style="width:100%;">
+          ✨ 신규 주민 회원가입
+        </button>
       </div>
     </div>
   </section>
@@ -593,6 +596,86 @@
             <!-- JS 동적생성 -->
           </tbody>
         </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       10. 회원가입 스크린 (selfRegister - 교사 초대코드 인증)
+       ======================================================== -->
+  <section id="screen-signup" class="screen">
+    <div class="login-card" style="max-width: 450px; margin: 0 auto;">
+      <h2>✨ 우리반 마을 가입신청</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem;">
+        선생님께 받은 <b>초대 코드</b>를 입력하고 마을 주민으로 등록되세요!
+      </p>
+
+      <!-- 초대코드 안내 박스 -->
+      <div style="background:#fef3c7; border:2px solid #f59e0b; border-radius:8px; padding:10px 14px; font-size:0.85rem; color:#78350f;">
+        🔑 <b>초대 코드</b>는 선생님의 관리자 PIN 번호입니다.<br>
+        선생님께 문의하거나 칠판/안내문에서 확인하세요.
+      </div>
+
+      <form id="signup-form" style="display:flex; flex-direction:column; gap:12px;" onsubmit="event.preventDefault(); (async()=>{
+        const studentId = document.getElementById('signup-id').value.trim();
+        const name = document.getElementById('signup-name').value.trim();
+        const pin = document.getElementById('signup-pin').value.trim();
+        const pinConfirm = document.getElementById('signup-pin-confirm').value.trim();
+        const teacherCode = document.getElementById('signup-teacher-code').value.trim();
+
+        if(!studentId || !name || !pin || !teacherCode) {
+          return App.modal.alert('입력 오류', '모든 항목을 빠짐없이 입력하세요.');
+        }
+        if(pin !== pinConfirm) {
+          return App.modal.alert('입력 오류', '비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+        }
+        if(pin.length < 4) {
+          return App.modal.alert('입력 오류', '비밀번호는 4자리 이상 입력하세요.');
+        }
+
+        const res = await API.call('selfRegister', { studentId, name, pin, teacherCode });
+        if(res.success) {
+          App.modal.alert('🎉 가입 성공!', `${name} 님, 우리반 마을 주민이 되었습니다!<br>등록하신 학번과 PIN으로 로그인해주세요.`, () => {
+            window.location.hash = '#login';
+          });
+        } else {
+          App.modal.alert('가입 실패 ❌', res.error || '오류가 발생했습니다.');
+        }
+      })()">
+        <div class="form-group">
+          <label for="signup-id">학번 (로그인 ID)</label>
+          <input type="text" id="signup-id" class="form-input" placeholder="예: 20101" required>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-name">이름 (실명)</label>
+          <input type="text" id="signup-name" class="form-input" placeholder="예: 홍길동" required>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-pin">비밀번호 (PIN) 설정</label>
+          <input type="password" id="signup-pin" class="form-input" placeholder="4자리 이상 숫자" required minlength="4">
+        </div>
+
+        <div class="form-group">
+          <label for="signup-pin-confirm">비밀번호 확인</label>
+          <input type="password" id="signup-pin-confirm" class="form-input" placeholder="비밀번호 재입력" required>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-teacher-code">선생님 초대 코드</label>
+          <input type="password" id="signup-teacher-code" class="form-input" placeholder="선생님께 받은 초대 코드" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%; padding:12px; font-size:1.05rem;">
+          🏡 마을 주민 등록 신청하기
+        </button>
+      </form>
+
+      <div style="margin-top:12px; text-align:center;">
+        <button onclick="window.location.hash='#login'" class="btn btn-sm" style="width:100%;">
+          ← 로그인 화면으로 돌아가기
+        </button>
       </div>
     </div>
   </section>

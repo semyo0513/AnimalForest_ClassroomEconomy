@@ -29,8 +29,8 @@ const App = {
   handleRouting: function() {
     const hash = window.location.hash || '#login';
     
-    // 로그인 체크 (로그인 화면이 아닌데 세션이 없으면 로그인으로 튕김)
-    if (hash !== '#login' && !Auth.currentUser) {
+    // 로그인 체크 (로그인/회원가입 화면이 아닌데 세션이 없으면 로그인으로 튕김)
+    if (hash !== '#login' && hash !== '#signup' && !Auth.currentUser) {
       window.location.hash = '#login';
       return;
     }
@@ -80,6 +80,13 @@ const App = {
     switch(viewName) {
       case 'login':
         Auth.logout(); // 로그인 화면 진입 시 로그아웃 처리
+        break;
+      case 'signup':
+        // 회원가입 폼 초기화
+        ['signup-id','signup-name','signup-pin','signup-pin-confirm','signup-teacher-code'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = '';
+        });
         break;
       case 'village':
         await Village.start();

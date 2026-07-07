@@ -755,6 +755,55 @@ const API = {
         };
       }
 
+      case 'selfRegister': {
+        const users = this.mockDb.get('Users');
+        const houses = this.mockDb.get('Houses');
+
+        // 교사 계정 PIN으로 초대 코드 검증
+        const teacher = users.find(u => u.studentId === 'teacher');
+        if (!teacher) {
+          return { success: false, error: '교사 계정을 찾을 수 없습니다.' };
+        }
+        if (String(teacher.pin) !== String(params.teacherCode)) {
+          return { success: false, error: '초대 코드가 올바르지 않습니다. 선생님께 초대 코드를 받아주세요.' };
+        }
+        if (users.some(u => u.studentId === params.studentId)) {
+          return { success: false, error: '이미 존재하는 학생 ID입니다.' };
+        }
+
+        const newUser = {
+          studentId: params.studentId,
+          name: params.name,
+          pin: String(params.pin),
+          role: 'student',
+          balance: 0,
+          avatarConfig: '{"skin":"#ffedd5","hair":"#10b981","eyes":"#1e293b","gender":"male"}',
+          petId: '',
+          lastLogin: new Date().toISOString()
+        };
+        users.push(newUser);
+        this.mockDb.set('Users', users);
+
+        const newHouse = {
+          studentId: params.studentId,
+          layoutData: '[]',
+          wallThemeId: 'wall_default',
+          floorThemeId: 'floor_default',
+          bulletinMemo: ''
+        };
+        houses.push(newHouse);
+        this.mockDb.set('Houses', houses);
+
+        const { pin, ...sanitized } = newUser;
+        return { success: true, data: sanitized };
+      }
+
+      case 'checkDB':
+        return { success: true, data: { spreadsheetId: 'local_mock_db', sheets: ['Users','Houses','MarketItems','Inventory','Transactions','Announcements','Missions','MissionProgress','HarvestNodes','Pets'] } };
+
+      case 'forceInitDB':
+        return { success: true, data: { message: '로컬 데이터베이스가 강제 재초기화되었습니다.', spreadsheetId: 'local_mock_db' } };
+
       default:
         return { success: false, error: 'Unknown action: ' + action };
     }

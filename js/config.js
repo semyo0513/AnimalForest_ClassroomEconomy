@@ -2,7 +2,7 @@
 
 const CONFIG = {
   // Google Apps Script 웹 앱 배포 URL (배포 후 이곳에 입력)
-  GAS_URL: "https://script.google.com/macros/s/AKfycbx7pPh_cLoKD0_gXd1Ic1feqJSm7Vqx6TSqFB9dCN2OOKbCcnRY5weBRDvkp1CDlviF/exec", 
+  GAS_URL: "https://script.google.com/macros/s/AKfycbyYaKubbynYaEXOarTbgymAh6V17YIhzvfDuzBIgBk7LSRdab6JYGO6kXEiQulbvaBk/exec", 
 
   // 역할 및 권한 설정
   ROLES: {

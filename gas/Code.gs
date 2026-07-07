@@ -248,11 +248,20 @@ function doGet(e) {
       case 'registerStudent':
         result = handleRegisterStudent(e.parameter);
         break;
+      case 'selfRegister':
+        result = handleSelfRegister(e.parameter);
+        break;
       case 'getTransactions':
         result = handleGetTransactions(e.parameter);
         break;
       case 'createMission':
         result = handleCreateMission(e.parameter);
+        break;
+      case 'forceInitDB':
+        result = initializeDatabase(true);
+        break;
+      case 'checkDB':
+        result = handleCheckDB();
         break;
       default:
         result = { success: false, error: 'Unknown action: ' + action };
@@ -267,24 +276,10 @@ function doGet(e) {
 // ========================================================
 // initializeDatabase
 // ========================================================
-function initializeDatabase() {
+function initializeDatabase(force) {
   var props = PropertiesService.getScriptProperties();
   var existingId = props.getProperty(PROP_KEY_SS_ID);
-
-  // Check if spreadsheet already exists
-  if (existingId) {
-    try {
-      var existing = SpreadsheetApp.openById(existingId);
-      return { success: true, data: { message: '데이터베이스가 이미 존재합니다.', spreadsheetId: existingId } };
-    } catch (err) {
-      // stale ID, continue to create new
-    }
-  }
-
-  // Create new spreadsheet
-  var ss = SpreadsheetApp.create(SPREADSHEET_NAME);
-  var ssId = ss.getId();
-  props.setProperty(PROP_KEY_SS_ID, ssId);
+  var ss = null;
 
   // Define sheets and their headers
   var sheetDefs = [
@@ -300,52 +295,78 @@ function initializeDatabase() {
     { name: 'Pets', headers: ['studentId', 'species', 'growthStage', 'affinity', 'acquiredAt'] }
   ];
 
-  // Create each sheet
+  // 기존 스프레드시트 연결 시도
+  if (existingId && !force) {
+    try {
+      ss = SpreadsheetApp.openById(existingId);
+      // 누락된 시트가 있으면 자동 생성
+      var addedSheets = [];
+      for (var ci = 0; ci < sheetDefs.length; ci++) {
+        if (!ss.getSheetByName(sheetDefs[ci].name)) {
+          var newSheet = ss.insertSheet(sheetDefs[ci].name);
+          newSheet.getRange(1, 1, 1, sheetDefs[ci].headers.length).setValues([sheetDefs[ci].headers]);
+          newSheet.getRange(1, 1, 1, sheetDefs[ci].headers.length).setFontWeight('bold');
+          newSheet.setFrozenRows(1);
+          addedSheets.push(sheetDefs[ci].name);
+        }
+      }
+      return {
+        success: true,
+        data: {
+          message: addedSheets.length > 0
+            ? '누락 시트를 추가했습니다: ' + addedSheets.join(', ')
+            : '데이터베이스가 이미 존재합니다.',
+          spreadsheetId: existingId,
+          spreadsheetUrl: ss.getUrl()
+        }
+      };
+    } catch (err) {
+      // stale ID – 새로 생성
+      props.deleteProperty(PROP_KEY_SS_ID);
+    }
+  }
+
+  // 신규 스프레드시트 생성 (또는 force 재초기화)
+  ss = SpreadsheetApp.create(SPREADSHEET_NAME);
+  var ssId = ss.getId();
+  props.setProperty(PROP_KEY_SS_ID, ssId);
+
+  // 각 시트 생성
   for (var i = 0; i < sheetDefs.length; i++) {
     var def = sheetDefs[i];
     var sheet;
     if (i === 0) {
-      // Rename the default sheet
       sheet = ss.getSheets()[0];
       sheet.setName(def.name);
     } else {
       sheet = ss.insertSheet(def.name);
     }
     sheet.getRange(1, 1, 1, def.headers.length).setValues([def.headers]);
-    // Bold and freeze header row
     sheet.getRange(1, 1, 1, def.headers.length).setFontWeight('bold');
     sheet.setFrozenRows(1);
   }
 
-  // Delete any remaining default sheets (e.g. '시트1' or 'Sheet1')
+  // 기본 시트('시트1' 등) 삭제
   var allSheets = ss.getSheets();
   var validNames = [];
-  for (var v = 0; v < sheetDefs.length; v++) {
-    validNames.push(sheetDefs[v].name);
-  }
+  for (var v = 0; v < sheetDefs.length; v++) { validNames.push(sheetDefs[v].name); }
   for (var s = 0; s < allSheets.length; s++) {
     var sName = allSheets[s].getName();
     var isValid = false;
     for (var vn = 0; vn < validNames.length; vn++) {
-      if (validNames[vn] === sName) {
-        isValid = true;
-        break;
-      }
+      if (validNames[vn] === sName) { isValid = true; break; }
     }
-    if (!isValid) {
-      ss.deleteSheet(allSheets[s]);
-    }
+    if (!isValid) { ss.deleteSheet(allSheets[s]); }
   }
 
-  // Create default teacher account
+  // 기본 교사 계정 및 집 생성
   var usersSheet = ss.getSheetByName('Users');
   usersSheet.appendRow(['teacher', '교사', '0000', 'teacher', 999999, '', '', nowISO()]);
 
-  // Create default teacher house
   var housesSheet = ss.getSheetByName('Houses');
   housesSheet.appendRow(['teacher', '[]', 'wall_default', 'floor_default', '']);
 
-  // Create default harvest nodes
+  // 기본 수확 노드
   var harvestSheet = ss.getSheetByName('HarvestNodes');
   var defaultDropTable1 = JSON.stringify([
     { type: 'coin', min: 10, max: 30, weight: 60 },
@@ -366,7 +387,7 @@ function initializeDatabase() {
   harvestSheet.appendRow(['node_2', 4, 13, defaultDropTable2, '{}']);
   harvestSheet.appendRow(['node_3', 17, 6, defaultDropTable3, '{}']);
 
-  // Create default market items
+  // 기본 마켓 아이템
   var marketSheet = ss.getSheetByName('MarketItems');
   var defaultItems = [
     { itemId: 'item_desk', name: '나무 책상', category: 'furniture', price: 100, stock: 99, imageUrl: '', registeredBy: 'teacher', registeredAt: nowISO() },
@@ -388,13 +409,9 @@ function initializeDatabase() {
     { itemId: 'item_wood', name: '나무', category: 'harvest', price: 20, stock: 0, imageUrl: '', registeredBy: 'system', registeredAt: nowISO() },
     { itemId: 'item_stone', name: '돌', category: 'harvest', price: 15, stock: 0, imageUrl: '', registeredBy: 'system', registeredAt: nowISO() }
   ];
-
   for (var d = 0; d < defaultItems.length; d++) {
     var item = defaultItems[d];
-    marketSheet.appendRow([
-      item.itemId, item.name, item.category, item.price,
-      item.stock, item.imageUrl, item.registeredBy, item.registeredAt
-    ]);
+    marketSheet.appendRow([item.itemId, item.name, item.category, item.price, item.stock, item.imageUrl, item.registeredBy, item.registeredAt]);
   }
 
   return {
@@ -405,6 +422,24 @@ function initializeDatabase() {
       spreadsheetUrl: ss.getUrl()
     }
   };
+}
+
+// ========================================================
+// checkDB - DB 상태 확인 (시트 목록 반환)
+// ========================================================
+function handleCheckDB() {
+  var props = PropertiesService.getScriptProperties();
+  var ssId = props.getProperty(PROP_KEY_SS_ID);
+  if (!ssId) {
+    return { success: false, error: '스프레드시트 ID가 저장되어 있지 않습니다. initializeDatabase를 먼저 실행하세요.' };
+  }
+  try {
+    var ss = SpreadsheetApp.openById(ssId);
+    var sheets = ss.getSheets().map(function(sh) { return sh.getName(); });
+    return { success: true, data: { spreadsheetId: ssId, spreadsheetUrl: ss.getUrl(), sheets: sheets } };
+  } catch (err) {
+    return { success: false, error: 'ID로 스프레드시트를 열 수 없습니다: ' + err.message };
+  }
 }
 
 // ========================================================
@@ -492,7 +527,7 @@ function handleGetUserState(params) {
 }
 
 // ========================================================
-// registerStudent
+// registerStudent (교사/월급담당관 권한 필요)
 // ========================================================
 function handleRegisterStudent(params) {
   var studentId = params.studentId;
@@ -504,17 +539,54 @@ function handleRegisterStudent(params) {
     return { success: false, error: '필수 항목이 누락되었습니다. (studentId, name, pin, requesterId)' };
   }
 
-  // Check permission
   if (!hasRole(requesterId, ['teacher', 'salary_manager'])) {
     return { success: false, error: '학생 등록 권한이 없습니다.' };
   }
 
+  return _doRegisterStudent(studentId, name, pin);
+}
+
+// ========================================================
+// selfRegister (학생 직접 회원가입 - 교사 초대코드 필요)
+// ========================================================
+function handleSelfRegister(params) {
+  var studentId = params.studentId;
+  var name = params.name;
+  var pin = params.pin;
+  var teacherCode = params.teacherCode; // 교사가 설정한 초대 코드
+
+  if (!studentId || !name || !pin || !teacherCode) {
+    return { success: false, error: '필수 항목이 누락되었습니다. (studentId, name, pin, teacherCode)' };
+  }
+
+  // 교사 계정의 PIN을 초대 코드로 사용
+  var usersSheet = getSheet('Users');
+  if (!usersSheet) {
+    return { success: false, error: '데이터베이스가 초기화되지 않았습니다. 선생님께 문의하세요.' };
+  }
+
+  var teacherUser = findRow(usersSheet, 'studentId', 'teacher');
+  if (!teacherUser) {
+    return { success: false, error: '교사 계정을 찾을 수 없습니다.' };
+  }
+
+  // 교사 PIN으로 초대코드 검증
+  if (String(teacherUser.pin) !== String(teacherCode)) {
+    return { success: false, error: '초대 코드가 올바르지 않습니다. 선생님께 초대 코드를 받아주세요.' };
+  }
+
+  return _doRegisterStudent(studentId, name, pin);
+}
+
+// ========================================================
+// _doRegisterStudent (실제 DB 처리 내부 공통 함수)
+// ========================================================
+function _doRegisterStudent(studentId, name, pin) {
   var usersSheet = getSheet('Users');
   if (!usersSheet) {
     return { success: false, error: '데이터베이스가 초기화되지 않았습니다.' };
   }
 
-  // Check if studentId already exists
   var existing = findRow(usersSheet, 'studentId', studentId);
   if (existing) {
     return { success: false, error: '이미 존재하는 학생 ID입니다.' };
@@ -524,10 +596,8 @@ function handleRegisterStudent(params) {
   try {
     lock.waitLock(10000);
 
-    // Add user
     usersSheet.appendRow([studentId, name, String(pin), 'student', 0, '', '', nowISO()]);
 
-    // Create house
     var housesSheet = getSheet('Houses');
     if (housesSheet) {
       housesSheet.appendRow([studentId, '[]', 'wall_default', 'floor_default', '']);
