@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏘️ 우리반 마을 - 학급 경제 월드</title>
+  <meta name="description" content="동물의 숲 스타일의 2D 픽셀 기반 학급 경제 게임 웹 애플리케이션입니다.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ========================================================
+       글로벌 로딩 오버레이
+       ======================================================== -->
+  <div id="global-loader" class="global-loader">
+    <div class="spinner"></div>
+    <div class="loader-text">서버와 통신하는 중...</div>
+  </div>
+
+  <!-- ========================================================
+       글로벌 모달 시스템 (커스텀 팝업)
+       ======================================================== -->
+  <div id="global-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <span id="modal-title">알림</span>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- 동적 삽입 -->
+      </div>
+      <div class="modal-footer">
+        <button id="modal-btn-cancel" class="btn btn-sm">취소</button>
+        <button id="modal-btn-confirm" class="btn btn-sm btn-primary">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       메인 헤더 및 글로벌 네비게이션
+       ======================================================== -->
+  <header id="main-header" class="game-header" style="display: none;">
+    <div class="logo-container">
+      <span class="logo-text">🏘️ 우리반 마을</span>
+    </div>
+    
+    <div class="status-bar">
+      <!-- 역할 배지 -->
+      <span id="header-user-role" class="badge">주민</span>
+      <!-- 닉네임 배지 -->
+      <span class="badge" style="background:#e0f2fe; border-color:#0284c7;">
+        👤 <span id="header-user-name">로딩중</span> 님
+      </span>
+      <!-- 코인 잔액 배지 -->
+      <span class="badge balance">
+        💰 <span id="header-user-balance">0</span> 코인
+      </span>
+    </div>
+  </header>
+
+  <!-- 글로벌 네비게이션 툴바 (헤더 아래 붙음) -->
+  <nav id="global-nav" class="game-header" style="display: none; padding: 6px 16px; background: #fffbeb; border-top: none;">
+    <div style="display: flex; gap: 8px; overflow-x: auto; width: 100%; justify-content: center;">
+      <a href="#village" id="nav-village" class="btn btn-sm btn-accent">🏡 마을 가기</a>
+      <a href="#my-house" id="nav-house" class="btn btn-sm btn-accent">🖼️ 내 방 꾸미기</a>
+      <a href="#market" id="nav-market" class="btn btn-sm btn-accent">🛒 마켓 상점</a>
+      <a href="#missions" id="nav-missions" class="btn btn-sm btn-accent">🎯 미션 게시판</a>
+      <a href="#announcements" id="nav-announcements" class="btn btn-sm btn-accent">📢 마을 소식</a>
+      <a href="#inventory" id="nav-inventory" class="btn btn-sm btn-accent">🎒 보관함</a>
+      <a href="#admin" id="nav-admin" class="btn btn-sm btn-primary" style="display: none;">👮 관리자 콘솔</a>
+      <a href="#login" id="nav-logout" class="btn btn-sm btn-danger">🚪 로그아웃</a>
+    </div>
+  </nav>
+
+  <!-- ========================================================
+       1. 로그인 스크린
+       ======================================================== -->
+  <section id="screen-login" class="screen active">
+    <div class="login-card">
+      <h2>🏘️ 우리반 마을 로그인</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem;">학번(ID)과 비밀번호(PIN)를 입력하고 마을에 입주하세요!</p>
+      
+      <form id="login-form" onsubmit="event.preventDefault(); (async()=>{
+        const id = document.getElementById('login-id').value.trim();
+        const pin = document.getElementById('login-pin').value.trim();
+        if(!id || !pin) return App.modal.alert('로그인 오류', '학번과 PIN을 입력하세요.');
+        const res = await Auth.login(id, pin);
+        if(res.success){
+          document.getElementById('global-nav').style.display = 'flex';
+          window.location.hash = '#village';
+        } else {
+          App.modal.alert('로그인 실패 ❌', res.error);
+        }
+      })()">
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label for="login-id">학번 또는 교사 ID</label>
+          <input type="text" id="login-id" class="form-input" placeholder="예: 20101 또는 teacher" required>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label for="login-pin">비밀번호 (PIN)</label>
+          <input type="password" id="login-pin" class="form-input" placeholder="비밀번호 4자리" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 12px;">
+          마들 입주하기 🔑
+        </button>
+      </form>
+
+      <div style="margin-top:8px; font-size:0.8rem; color:var(--text-muted);">
+        * 데모 테스트 계정: student1 / 1234, student2 / 1234, teacher / 0000
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       2. 마을 맵 스크린 (Canvas 2D 탑다운 게임)
+       ======================================================== -->
+  <section id="screen-village" class="screen">
+    <div class="game-container">
+      <div class="panel-header" style="width:100%;">
+        <span class="panel-title">🌳 우리반 마을 광장</span>
+        <span class="text-muted" style="font-size:0.9rem;">WASD / 방향키로 움직이고 문/상대 앞에서 E키를 눌러 대화/입장하세요.</span>
+      </div>
+
+      <div class="canvas-wrapper">
+        <!-- 2D Canvas -->
+        <canvas id="village-canvas"></canvas>
+        
+        <!-- 가상 조이스틱 (모바일 대응) -->
+        <div id="joystick-container" class="joystick-container">
+          <div id="joystick-stick" class="joystick-stick"></div>
+        </div>
+
+        <!-- 상호작용 안내 레이어 -->
+        <div id="interaction-tip" class="interaction-tip" style="display: none;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       3. 내 집 꾸미기 스크린
+       ======================================================== -->
+  <section id="screen-my-house" class="screen">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">🖼️ 내 방 인테리어 꾸미기</span>
+        <button id="house-btn-save" class="btn btn-primary btn-sm">💾 인테리어 저장하기</button>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;">
+        <!-- Canvas Grid -->
+        <div class="canvas-wrapper" style="line-height:0;">
+          <canvas id="house-canvas"></canvas>
+        </div>
+
+        <!-- 편집 사이드 바 -->
+        <div id="house-edit-panel" style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 16px;">
+          <div style="border: 2px solid var(--border-color); border-radius: 8px; padding: 12px; background: white;">
+            <h4 style="color:var(--border-color); margin-bottom:8px;">🎨 인테리어 모드 선택</h4>
+            
+            <div class="form-group" style="margin-bottom:8px;">
+              <label>배치할 가구 (보관함)</label>
+              <select id="house-furniture-select" class="form-input"></select>
+            </div>
+            
+            <button id="house-btn-delete-mode" class="btn btn-sm btn-danger" style="width:100%; margin-bottom:8px;">
+              가구 회수하기
+            </button>
+            <p style="font-size:0.8rem; color:var(--text-muted);">* 가구 배치 모드 중에는 가구 선택 후 바닥을 클릭하고, 회수 모드 중에는 바닥의 가구를 클릭하세요.</p>
+          </div>
+
+          <div style="border: 2px solid var(--border-color); border-radius: 8px; padding: 12px; background: white;">
+            <h4 style="color:var(--border-color); margin-bottom:8px;">🏠 벽지 및 바닥지</h4>
+            <div class="form-group" style="margin-bottom:8px;">
+              <label>벽 테마 선택</label>
+              <select id="house-wall-select" class="form-input">
+                <option value="wall_default">기본 회색 벽</option>
+                <option value="wall_blue">하늘빛 구름 벽지</option>
+                <option value="wall_pink">핑크빛 하트 벽지</option>
+                <option value="wall_green">싱그러운 초록 벽지</option>
+                <option value="wall_wood">클래식 나무 벽지</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>바닥 테마 선택</label>
+              <select id="house-floor-select" class="form-input">
+                <option value="floor_default">기본 그레이 타일</option>
+                <option value="floor_wood">나무 마룻바닥</option>
+                <option value="floor_tile">체크무늬 민트 타일</option>
+                <option value="floor_carpet">포근한 핑크 카펫</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 게시판 / 방명록 한줄 선언 -->
+      <div style="border:3px solid var(--border-color); border-radius:12px; padding:16px; background:#fff;">
+        <h4 id="house-memo-title" style="color:var(--border-color); margin-bottom:8px;">🏡 알림 방명록</h4>
+        <div id="house-memo-text" style="font-size:0.95rem; margin-bottom:12px; line-height:1.4;"></div>
+        
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="house-memo-input" class="form-input" style="flex:1;" placeholder="내 집을 방문한 주민들에게 띄울 알림글을 쓰세요 (최대 50자)">
+          <button id="house-btn-memo-submit" class="btn btn-accent">작성</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       4. 친구 집 방문 스크린
+       ======================================================== -->
+  <section id="screen-visit-house" class="screen">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">🔍 친구 집 방문 중</span>
+        <a href="#village" class="btn btn-primary btn-sm">🏃 마을로 돌아가기</a>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;">
+        <div class="canvas-wrapper">
+          <canvas id="visit-house-canvas" style="display: none;"></canvas>
+          <!-- 하우스 캔버스를 재사용하기 위해 js에서 canvas 바인딩 처리를 유연하게 유도 -->
+        </div>
+
+        <div style="flex:1; display:flex; flex-direction:column; gap:16px; min-width:250px;">
+          <!-- 방명록 메모 상자 -->
+          <div style="border:3px solid var(--border-color); border-radius:12px; padding:16px; background:#fff; height:100%;">
+            <h4 id="visit-house-memo-title" style="color:var(--border-color); margin-bottom:8px;">🏡 주민 알림 방명록</h4>
+            <div id="visit-house-memo-text" style="font-size:1rem; margin-bottom:16px; padding:12px; background:#fffbeb; border:2px dashed var(--border-color); border-radius:8px; line-height:1.5;">
+              로딩중...
+            </div>
+            
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <label style="font-weight:600; font-size:0.9rem; color:var(--text-muted);">이 집에 따뜻한 한 줄 방명록을 남겨주세요!</label>
+              <div style="display:flex; gap:8px;">
+                <input type="text" id="visit-house-memo-input" class="form-input" style="flex:1;" placeholder="방명록 남기기...">
+                <button id="visit-house-btn-memo-submit" class="btn btn-accent">남기기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       5. 마켓 스크린
+       ======================================================== -->
+  <section id="screen-market" class="screen">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">🛒 마을 마켓 상점</span>
+      </div>
+
+      <!-- 카테고리 필터 탭 -->
+      <div class="market-nav">
+        <div class="category-tabs">
+          <button class="btn btn-sm btn-primary market-category-tab" data-category="all">전체 상품</button>
+          <button class="btn btn-sm market-category-tab" data-category="furniture">가구</button>
+          <button class="btn btn-sm market-category-tab" data-category="wallpaper">벽지</button>
+          <button class="btn btn-sm market-category-tab" data-category="flooring">바닥</button>
+          <button class="btn btn-sm market-category-tab" data-category="harvest">수확물</button>
+        </div>
+      </div>
+
+      <!-- 상품 격자 -->
+      <div id="market-item-grid" class="item-grid">
+        <!-- JS 동적 생성 -->
+      </div>
+
+      <!-- 마켓운영자 전용 물품 관리 패널 -->
+      <div id="market-manager-panel" style="display: none; border-top:4px dashed var(--border-color); margin-top:24px; padding-top:20px;">
+        <h3 style="color:var(--border-color); margin-bottom:12px;">👮 마켓 운영자 전용: 상품 관리 콘솔</h3>
+        
+        <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start;">
+          <!-- 등록 / 수정 폼 -->
+          <form id="market-form-item" style="flex:1; min-width:280px; display:flex; flex-direction:column; gap:8px; border:2px solid var(--border-color); border-radius:8px; padding:16px; background:#fff;">
+            <input type="hidden" id="market-input-id">
+            
+            <div class="form-group">
+              <label>상품 이름</label>
+              <input type="text" id="market-input-name" class="form-input" required placeholder="예: 원목 책상">
+            </div>
+            
+            <div class="form-group">
+              <label>카테고리</label>
+              <select id="market-input-category" class="form-input">
+                <option value="furniture">가구</option>
+                <option value="wallpaper">벽지</option>
+                <option value="flooring">바닥지</option>
+                <option value="harvest">수확물</option>
+                <option value="etc">기타</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>판매가 (코인)</label>
+              <input type="number" id="market-input-price" class="form-input" min="1" value="100" required>
+            </div>
+
+            <div class="form-group">
+              <label>등록 재고 (개)</label>
+              <input type="number" id="market-input-stock" class="form-input" min="0" value="10" required>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <button type="button" id="market-btn-form-reset" class="btn btn-sm" style="flex:1;">초기화</button>
+              <button type="submit" class="btn btn-sm btn-primary" style="flex:2;">신규 상품 등록하기</button>
+            </div>
+          </form>
+
+          <!-- 마켓 상품 테이블 -->
+          <div class="table-container" style="flex:2; min-width:320px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>아이템 ID</th>
+                  <th>상품명</th>
+                  <th>카테고리</th>
+                  <th>가격</th>
+                  <th>재고</th>
+                  <th>관리</th>
+                </tr>
+              </thead>
+              <tbody id="market-tbody-items">
+                <!-- JS 생성 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       6. 미션 스크린
+       ======================================================== -->
+  <section id="screen-missions" class="screen">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">🎯 마을 미션 게시판</span>
+      </div>
+      <p style="color:var(--text-muted); font-size:0.9rem;">학급 미션을 완수하고 코인을 보상받으세요!</p>
+
+      <div id="missions-list" style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">
+        <!-- JS 동적 렌더링 -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       7. 공지사항 스크린
+       ======================================================== -->
+  <section id="screen-announcements" class="screen">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">📢 마을 공지 소식통</span>
+      </div>
+
+      <!-- 교사 전용 공지 올리기 폼 -->
+      <div id="ann-teacher-panel" style="display:none; border:2px solid var(--border-color); border-radius:12px; padding:16px; background:#fff; margin-bottom:16px;">
+        <h4 style="color:var(--border-color); margin-bottom:12px;">선생님 공지사항 작성란</h4>
+        <form id="ann-form-post" style="display:flex; flex-direction:column; gap:8px;">
+          <div class="form-group">
+            <label>제목</label>
+            <input type="text" id="ann-input-title" class="form-input" placeholder="공지사항 제목" required>
+          </div>
+          <div class="form-group">
+            <label>본문 내용</label>
+            <textarea id="ann-input-content" class="form-input" rows="3" placeholder="공지할 본문 세부 내용을 쓰세요" required></textarea>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+            <label style="display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="ann-input-pinned"> 📌 중요 공지로 상단 고정 (접속시 자동 팝업)
+            </label>
+            <button type="submit" class="btn btn-primary">공지 올리기</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- 공지 리스트 -->
+      <div id="announcements-list" style="display:flex; flex-direction:column; gap:12px;">
+        <!-- JS 동적 렌더링 -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       8. 보관함(인벤토리) 스크린
+       ======================================================== -->
+  <section id="screen-inventory" class="screen">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">🎒 나의 보관함 (인벤토리)</span>
+      </div>
+      <p style="color:var(--text-muted); font-size:0.9rem;">마켓에서 구매한 인테리어 가구와 수확한 활동 전리품 목록입니다.</p>
+
+      <div id="inventory-list" style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">
+        <!-- JS 동적 렌더링 -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       9. 관리자 스크린 (교사 및 4대 직업 통합 컨트롤 센터)
+       ======================================================== -->
+  <section id="screen-admin" class="screen">
+    <div class="admin-header">
+      <h2 style="color:var(--border-color);">👮 직업 행정 통합 콘솔</h2>
+      <span class="text-muted">귀하의 직업 권한에 맞춰 행정 명령 탭이 활성화됩니다.</span>
+    </div>
+
+    <!-- 탭 가로 헤더 -->
+    <div class="admin-tabs">
+      <button class="admin-tab-btn active" id="admin-tab-salary" data-tab="salary">💵 월급 지급</button>
+      <button class="admin-tab-btn" id="admin-tab-tax" data-tab="tax">🏛️ 세금 징수</button>
+      <button class="admin-tab-btn" id="admin-tab-penalty" data-tab="penalty">🚨 벌금 부과</button>
+      <button class="admin-tab-btn" id="admin-tab-register" data-tab="register">입주 등록</button>
+      <button class="admin-tab-btn" id="admin-tab-roles" data-tab="roles">역할 배정</button>
+      <button class="admin-tab-btn" id="admin-tab-mission" data-tab="mission">미션 생성</button>
+      <button class="admin-tab-btn" id="admin-tab-audit" data-tab="audit">🔍 거래 감사</button>
+    </div>
+
+    <!-- 탭 1: 월급 지급 (월급담당관, 교사) -->
+    <div class="tab-content active" id="admin-panel-salary">
+      <h3>💵 월급 일괄 지급하기</h3>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">월급을 줄 주민들을 다수 체크한 뒤 일괄 전송하세요.</p>
+      
+      <form id="admin-form-salary">
+        <div id="admin-salary-checklist" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:8px; max-height:220px; overflow-y:auto; border:2px solid var(--border-color); padding:10px; border-radius:8px; margin-bottom:12px; background:#fafafa;">
+          <!-- 주민 체크박스 동적 생성 -->
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:12px;">
+          <div class="form-group" style="flex:1; min-width:120px;">
+            <label>지급 금액</label>
+            <input type="number" id="admin-salary-amount" class="form-input" min="1" value="200" required>
+          </div>
+          <div class="form-group" style="flex:2; min-width:200px;">
+            <label>지급 사유</label>
+            <input type="text" id="admin-salary-reason" class="form-input" placeholder="급여 또는 보너스 항목명" value="기본 공공 월급" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top:12px; width:100%;">
+          급여 이체 및 송금 전송 💸
+        </button>
+      </form>
+    </div>
+
+    <!-- 탭 2: 세금 징수 (국세청장, 교사) -->
+    <div class="tab-content" id="admin-panel-tax">
+      <h3>🏛️ 국세 강제 징수 관리</h3>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">세금을 징수할 주민들을 체크하세요. (잔액보다 많은 세금은 징수 불가능)</p>
+      
+      <form id="admin-form-tax">
+        <div id="admin-tax-checklist" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:8px; max-height:220px; overflow-y:auto; border:2px solid var(--border-color); padding:10px; border-radius:8px; margin-bottom:12px; background:#fafafa;">
+          <!-- 주민 체크박스 동적 생성 -->
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:12px;">
+          <div class="form-group" style="flex:1; min-width:120px;">
+            <label>징수 세율(코인)</label>
+            <input type="number" id="admin-tax-amount" class="form-input" min="1" value="50" required>
+          </div>
+          <div class="form-group" style="flex:2; min-width:200px;">
+            <label>징수 근거</label>
+            <input type="text" id="admin-tax-reason" class="form-input" placeholder="예: 7월 주민세" value="기본 주민소득세" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-danger" style="margin-top:12px; width:100%;">
+          세금 일제 원천 징수 실행 🧾
+        </button>
+      </form>
+    </div>
+
+    <!-- 탭 3: 벌금 부과 (경찰, 교사) -->
+    <div class="tab-content" id="admin-panel-penalty">
+      <h3>🚨 벌금 부과 및 위반 딱지 발송</h3>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">교실 위반 행위를 벌점으로 차감 고지합니다.</p>
+      
+      <form id="admin-form-penalty">
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>피부과 대상 주민</label>
+          <select id="admin-penalty-user" class="form-input" required></select>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:12px;">
+          <div class="form-group" style="flex:1; min-width:120px;">
+            <label>벌금 차감 코인</label>
+            <input type="number" id="admin-penalty-amount" class="form-input" min="1" value="30" required>
+          </div>
+          <div class="form-group" style="flex:2; min-width:200px;">
+            <label>단속 위반 항목</label>
+            <input type="text" id="admin-penalty-reason" class="form-input" placeholder="예: 쓰레기 무단 투기" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-danger" style="margin-top:12px; width:100%;">
+          경찰 딱지 발부 👮
+        </button>
+      </form>
+    </div>
+
+    <!-- 탭 4: 입주 등록 (교사전용) -->
+    <div class="tab-content" id="admin-panel-register">
+      <h3>🏡 신규 주민 입주 등록</h3>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">신규 학생을 등록하면 기본 주택 데이터가 함께 자동 생성됩니다.</p>
+      
+      <form id="admin-form-register" style="max-width:400px; display:flex; flex-direction:column; gap:10px;">
+        <div class="form-group">
+          <label>입주 학번 ID</label>
+          <input type="text" id="admin-reg-id" class="form-input" placeholder="학번 5자리 (예: 20102)" required>
+        </div>
+        <div class="form-group">
+          <label>학생 실명</label>
+          <input type="text" id="admin-reg-name" class="form-input" placeholder="이름" required>
+        </div>
+        <div class="form-group">
+          <label>입주 초기 PIN번호</label>
+          <input type="text" id="admin-reg-pin" class="form-input" value="1234" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top:8px;">새 주민 등록 및 주택 준공 승인 🏗️</button>
+      </form>
+    </div>
+
+    <!-- 탭 5: 역할 배정 (교사전용) -->
+    <div class="tab-content" id="admin-panel-roles">
+      <h3>⚖️ 주민 직업 배정 목록</h3>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">각 주민들에게 월급/마켓/세금/경찰 역할을 지정할 수 있습니다.</p>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>학번 ID</th>
+              <th>이름</th>
+              <th>보유 코인</th>
+              <th>지정된 역할 (직업)</th>
+            </tr>
+          </thead>
+          <tbody id="admin-tbody-roles">
+            <!-- JS 동적 생성 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 탭 6: 미션 생성 (교사전용) -->
+    <div class="tab-content" id="admin-panel-mission">
+      <h3>🎯 새 미션(과제) 하달</h3>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">마을 전체 주민에게 새로운 미션을 제시하고 보상급을 설정합니다.</p>
+      
+      <form id="admin-form-mission" style="max-width:500px; display:flex; flex-direction:column; gap:10px;">
+        <div class="form-group">
+          <label>미션 상세 설명</label>
+          <input type="text" id="admin-mis-content" class="form-input" placeholder="예: 주말 교실 청소 봉사 1회" required>
+        </div>
+        <div class="form-group">
+          <label>지급 보상 (코인)</label>
+          <input type="number" id="admin-mis-reward" class="form-input" min="1" value="100" required>
+        </div>
+        <input type="hidden" id="admin-mis-target" value="all">
+        <button type="submit" class="btn btn-primary" style="margin-top:8px;">미션 게시판에 등록 및 전파 🎯</button>
+      </form>
+    </div>
+
+    <!-- 탭 7: 최근 거래 감사 (전체 공무원 및 교사 공통) -->
+    <div class="tab-content" id="admin-panel-audit">
+      <h3>🔍 주민 상세 금융거래 감사</h3>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">주민을 선택하여 부당 거래, 세금 체납, 벌점 거래 역사를 감사합니다.</p>
+      
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>감사 대상 주민</label>
+        <select id="admin-audit-user-select" class="form-input"></select>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>거래 ID</th>
+              <th>거래 종류</th>
+              <th>변동액</th>
+              <th>사유 요약</th>
+              <th>처리 요원</th>
+              <th>발생 시각</th>
+            </tr>
+          </thead>
+          <tbody id="admin-tbody-audit">
+            <!-- JS 동적생성 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       모듈 스크립트 의존성 주입 (로드 순서 보장 필수!)
+       ======================================================== -->
+  <script src="js/config.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/village.js"></script>
+  <script src="js/house.js"></script>
+  <script src="js/market.js"></script>
+  <script src="js/harvest.js"></script>
+  <script src="js/missions.js"></script>
+  <script src="js/announcements.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

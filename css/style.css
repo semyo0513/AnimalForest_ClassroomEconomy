@@ -1,0 +1,647 @@
+/* 🏘️ 우리반 마을 - 전체 스타일시트 (Cozy Pastel Retro Theme) */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@300;400;600;800&display=swap');
+
+:root {
+  /* 파스텔 디자인 토큰 */
+  --bg-sky: #e0f2fe;
+  --bg-ground: #fefce8;
+  --panel-bg: rgba(255, 255, 255, 0.9);
+  --primary: #10b981;
+  --primary-hover: #059669;
+  --primary-light: #d1fae5;
+  --accent: #fbbf24;
+  --accent-hover: #f59e0b;
+  --accent-light: #fef3c7;
+  --danger: #f87171;
+  --danger-hover: #ef4444;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #78350f; /* 아기자기한 갈색 보더 */
+  --border-radius: 12px;
+  --shadow: #b45309;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Outfit', sans-serif;
+  image-rendering: pixelated;
+}
+
+body {
+  background-color: var(--bg-sky);
+  color: var(--text-main);
+  overflow-x: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 픽셀아트 폰트 적용 클래스 */
+.pixel-font {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ========================================================
+   스크린 제어 & SPA 라우팅
+   ======================================================== */
+.screen {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.screen.active {
+  display: flex;
+  opacity: 1;
+}
+
+/* ========================================================
+   헤더 & 글로벌 네비게이션
+   ======================================================== */
+.game-header {
+  background: var(--panel-bg);
+  border-bottom: 4px solid var(--border-color);
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-text {
+  font-weight: 800;
+  color: var(--border-color);
+  font-size: 1.25rem;
+}
+
+.status-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.badge {
+  background: var(--accent-light);
+  border: 2px solid var(--border-color);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 0 var(--border-color);
+}
+
+.badge.balance {
+  background: #fef08a; /* Gold badge */
+}
+
+/* ========================================================
+   레트로 버튼 컴포넌트
+   ======================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border: 3px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--shadow);
+  transform: translateY(0);
+  transition: transform 0.05s, box-shadow 0.05s, background-color 0.15s;
+  text-decoration: none;
+  color: var(--text-main);
+  outline: none;
+}
+
+.btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--shadow);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-accent {
+  background-color: var(--accent);
+  color: var(--border-color);
+}
+.btn-accent:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: white;
+}
+.btn-danger:hover {
+  background-color: var(--danger-hover);
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  border-width: 2px;
+  box-shadow: 0 2px 0 var(--shadow);
+}
+.btn-sm:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 var(--shadow);
+}
+
+/* ========================================================
+   로그인 화면
+   ======================================================== */
+#screen-login {
+  max-width: 400px;
+  justify-content: center;
+  align-content: center;
+  min-height: calc(100vh - 120px);
+}
+
+.login-card {
+  background: var(--panel-bg);
+  border: 4px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 0 var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+}
+
+.login-card h2 {
+  color: var(--border-color);
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--border-color);
+}
+
+.form-input {
+  padding: 10px;
+  border: 3px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  background-color: #fff;
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+}
+
+/* ========================================================
+   마을 맵 & 집 꾸미기 (게임 뷰)
+   ======================================================== */
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  width: 100%;
+}
+
+.canvas-wrapper {
+  position: relative;
+  border: 6px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 0 var(--shadow);
+  background-color: #86efac; /* Green ground fallback */
+  line-height: 0;
+}
+
+canvas {
+  max-width: 100%;
+  display: block;
+}
+
+/* 가상 조이스틱 (모바일 터치용) */
+.joystick-container {
+  display: none;
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 50;
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 3px solid var(--border-color);
+  border-radius: 50%;
+  touch-action: none;
+}
+
+.joystick-stick {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  width: 40px;
+  height: 40px;
+  background: var(--border-color);
+  border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+  .joystick-container {
+    display: block;
+  }
+}
+
+.interaction-tip {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  pointer-events: none;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.3; }
+}
+
+/* ========================================================
+   마켓 UI
+   ======================================================== */
+.market-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 8px;
+}
+
+.category-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.item-card {
+  background: white;
+  border: 3px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 4px 0 var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.15s;
+  position: relative;
+}
+
+.item-card:hover {
+  transform: scale(1.02);
+}
+
+.item-sprite-box {
+  width: 64px;
+  height: 64px;
+  background: #f1f5f9;
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.item-name {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.item-price {
+  font-weight: 800;
+  color: #b45309;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.item-stock {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+/* ========================================================
+   관리자 패널 & 탭 구조
+   ======================================================== */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 4px solid var(--border-color);
+  padding-bottom: 0px;
+  margin-bottom: 16px;
+}
+
+.admin-tab-btn {
+  padding: 10px 16px;
+  border: 3px solid var(--border-color);
+  border-bottom: none;
+  background: #e2e8f0;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: -4px;
+}
+
+.admin-tab-btn.active {
+  background: white;
+  border-bottom: 4px solid white;
+  z-index: 10;
+}
+
+.tab-content {
+  display: none;
+  background: white;
+  border: 4px solid var(--border-color);
+  border-radius: 0 0 12px 12px;
+  padding: 20px;
+  box-shadow: 0 6px 0 var(--shadow);
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ========================================================
+   UI 레이아웃 패널 (기타 화면용 공통)
+   ======================================================== */
+.panel {
+  background: var(--panel-bg);
+  border: 4px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 6px 0 var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel-header {
+  border-bottom: 3px solid var(--border-color);
+  padding-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panel-title {
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--border-color);
+}
+
+/* ========================================================
+   테이블 스타일
+   ======================================================== */
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+th, td {
+  padding: 10px 12px;
+  border: 2px solid var(--border-color);
+  text-align: left;
+}
+
+th {
+  background-color: var(--accent-light);
+  font-weight: 700;
+}
+
+tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+/* ========================================================
+   모달 (팝업창)
+   ======================================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+  background: white;
+  border: 4px solid var(--border-color);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 8px 0 var(--shadow);
+  overflow: hidden;
+  animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+  background: var(--accent-light);
+  padding: 12px 16px;
+  border-bottom: 3px solid var(--border-color);
+  font-weight: 800;
+  color: var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-body {
+  padding: 16px;
+}
+
+.modal-footer {
+  padding: 12px 16px;
+  border-top: 2px dashed var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ========================================================
+   글로벌 로딩 오버레이
+   ======================================================== */
+.global-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.75);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.global-loader.active {
+  display: flex;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 6px solid var(--primary-light);
+  border-top: 6px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loader-text {
+  font-weight: 700;
+  color: var(--border-color);
+  font-size: 1rem;
+}
+
+/* ========================================================
+   수확 모달 및 리워드 이펙트
+   ======================================================== */
+.reward-anim-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+}
+
+.reward-sprite-container {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px dashed var(--accent);
+  border-radius: 50%;
+  background: #fef9c3;
+  animation: bounce 0.6s infinite alternate;
+}
+
+@keyframes bounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-10px); }
+}
+
+/* 리스트 항목 데코 */
+.list-item {
+  background: white;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.list-item.pinned {
+  border-color: var(--accent);
+  background-color: var(--accent-light);
+}
+
+.list-item-title {
+  font-weight: 700;
+}
+
+.list-item-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
