@@ -1,212 +1,497 @@
-/* 🏘️ 우리반 마을 - 전체 스타일시트 (Cozy Pastel Retro Theme) */
+/* ========================================================
+   🏘️ 우리반 마을 - 학급 경제 월드
+   디자인 테마: 액션 RPG + 픽셀 아트 판타지
+   ======================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@300;400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+KR:wght@400;600;700;900&family=Outfit:wght@300;400;600;800&display=swap');
 
+/* ========================================================
+   1. CSS 디자인 토큰 (Design System)
+   ======================================================== */
 :root {
-  /* 파스텔 디자인 토큰 */
-  --bg-sky: #e0f2fe;
-  --bg-ground: #fefce8;
-  --panel-bg: rgba(255, 255, 255, 0.9);
-  --primary: #10b981;
-  --primary-hover: #059669;
-  --primary-light: #d1fae5;
-  --accent: #fbbf24;
-  --accent-hover: #f59e0b;
-  --accent-light: #fef3c7;
-  --danger: #f87171;
-  --danger-hover: #ef4444;
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --border-color: #78350f; /* 아기자기한 갈색 보더 */
-  --border-radius: 12px;
-  --shadow: #b45309;
+  /* ── 핵심 팔레트: 다크 RPG ── */
+  --color-dark-bg:     #0f0e1a;
+  --color-dark-panel:  #1a1830;
+  --color-dark-card:   #221f3a;
+  --color-dark-border: #3d3860;
+
+  /* ── 브랜드 컬러 ── */
+  --color-gold:        #ffd700;
+  --color-gold-dark:   #b8860b;
+  --color-gold-light:  #fff3b0;
+  --color-emerald:     #10b981;
+  --color-emerald-dark:#059669;
+  --color-sky:         #38bdf8;
+  --color-purple:      #a78bfa;
+  --color-rose:        #f87171;
+  --color-rose-dark:   #dc2626;
+  --color-amber:       #fbbf24;
+
+  /* ── 픽셀 게임 UI 컬러 ── */
+  --color-wood-dark:   #6b3f1e;
+  --color-wood-mid:    #8b5e3c;
+  --color-wood-light:  #c4a882;
+  --color-paper:       #fef9ec;
+  --color-paper-border:#c4a14d;
+
+  /* ── 상태 컬러 (색상+텍스트 병행 필수) ── */
+  --color-success:     #22c55e;
+  --color-warning:     #f59e0b;
+  --color-danger:      #ef4444;
+  --color-info:        #3b82f6;
+
+  /* ── 텍스트 ── */
+  --text-on-dark:      #e8e4ff;
+  --text-muted-dark:   #9089c4;
+  --text-gold:         #ffd700;
+  --text-main:         #1e293b;
+  --text-muted:        #64748b;
+
+  /* ── 기존 호환 별칭 ── */
+  --bg-sky:            #1a1830;
+  --bg-ground:         #0f0e1a;
+  --panel-bg:          rgba(26,24,48,0.95);
+  --primary:           #10b981;
+  --primary-hover:     #059669;
+  --primary-light:     #064e3b;
+  --accent:            #fbbf24;
+  --accent-hover:      #f59e0b;
+  --accent-light:      #3d2f00;
+  --danger:            #f87171;
+  --danger-hover:      #dc2626;
+  --border-color:      #6b3f1e;
+  --border-radius:     10px;
+  --shadow:            #000000aa;
+
+  /* ── 간격 & 반경 ── */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --space-xs:    4px;
+  --space-sm:    8px;
+  --space-md:    16px;
+  --space-lg:    24px;
+
+  /* ── 그림자 ── */
+  --shadow-sm:   0 2px 0 #000;
+  --shadow-md:   0 4px 0 #000, 0 0 12px rgba(0,0,0,0.6);
+  --shadow-lg:   0 6px 0 #000, 0 0 24px rgba(0,0,0,0.8);
+  --glow-gold:   0 0 12px rgba(255,215,0,0.5), 0 0 24px rgba(255,215,0,0.2);
+  --glow-emerald:0 0 12px rgba(16,185,129,0.4);
+  --glow-purple: 0 0 12px rgba(167,139,250,0.4);
 }
 
-* {
+/* ========================================================
+   2. 전체 기반 스타일
+   ======================================================== */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Outfit', sans-serif;
   image-rendering: pixelated;
 }
 
 body {
-  background-color: var(--bg-sky);
-  color: var(--text-main);
+  font-family: 'Noto Sans KR', 'Outfit', sans-serif;
+  background: var(--color-dark-bg);
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(107,63,30,0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(167,139,250,0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(16,185,129,0.05) 0%, transparent 60%);
+  color: var(--text-on-dark);
   overflow-x: hidden;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* 픽셀아트 폰트 적용 클래스 */
+/* ── 픽셀 폰트 유틸리티 ── */
 .pixel-font {
   font-family: 'Press Start 2P', monospace;
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+/* ── 별빛 배경 파티클 ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 15% 25%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 35% 10%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 40%, rgba(255,215,0,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 15%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 55%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 8%  70%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 65% 80%, rgba(167,139,250,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 42% 60%, rgba(255,255,255,0.3) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+  animation: starTwinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes starTwinkle {
+  0%   { opacity: 0.7; }
+  100% { opacity: 1; }
 }
 
 /* ========================================================
-   스크린 제어 & SPA 라우팅
+   3. 스크린 제어 & SPA 라우팅
    ======================================================== */
 .screen {
   display: none;
   flex-direction: column;
   flex: 1;
   width: 100%;
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 16px;
+  padding: var(--space-md);
   opacity: 0;
-  transition: opacity 0.3s ease-in-out;
+  transform: translateY(6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .screen.active {
   display: flex;
   opacity: 1;
+  transform: translateY(0);
 }
 
 /* ========================================================
-   헤더 & 글로벌 네비게이션
+   4. 헤더 & 글로벌 네비게이션 (게임 HUD)
    ======================================================== */
 .game-header {
-  background: var(--panel-bg);
-  border-bottom: 4px solid var(--border-color);
-  padding: 12px 16px;
+  background: linear-gradient(180deg, #1a1830 0%, #13112a 100%);
+  border-bottom: 3px solid var(--color-gold);
+  padding: 10px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.8), 0 2px 0 rgba(255,215,0,0.3);
 }
 
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
+/* 게임 타이틀 로고 */
 .logo-text {
-  font-weight: 800;
-  color: var(--border-color);
-  font-size: 1.25rem;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  color: var(--color-gold);
+  text-shadow: var(--glow-gold), 2px 2px 0 #000, -1px -1px 0 #000;
+  letter-spacing: 1px;
 }
 
+/* HUD 상태바 */
 .status-bar {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
 }
 
+/* HUD 배지 */
 .badge {
-  background: var(--accent-light);
-  border: 2px solid var(--border-color);
-  border-radius: 20px;
-  padding: 4px 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  display: flex;
+  background: rgba(26,24,48,0.9);
+  border: 2px solid var(--color-gold);
+  border-radius: var(--radius-md);
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 0 2px 0 var(--border-color);
+  color: var(--text-on-dark);
+  box-shadow: 0 2px 0 #000, inset 0 1px 0 rgba(255,255,255,0.1);
 }
 
 .badge.balance {
-  background: #fef08a; /* Gold badge */
+  background: linear-gradient(135deg, #3d2f00 0%, #1a1300 100%);
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+  font-weight: 900;
+  font-size: 0.9rem;
+  box-shadow: var(--glow-gold), 0 2px 0 #000;
 }
 
 /* ========================================================
-   레트로 버튼 컴포넌트
+   5. 글로벌 네비게이션 (장소 이동 표지판)
+   ======================================================== */
+#global-nav {
+  background: linear-gradient(180deg, #13112a 0%, #0f0e1a 100%) !important;
+  border-bottom: 2px solid var(--color-dark-border) !important;
+  padding: 8px 16px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+
+#global-nav > div {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  width: 100%;
+  justify-content: center;
+  scrollbar-width: none;
+}
+#global-nav > div::-webkit-scrollbar { display: none; }
+
+/* 네비 버튼 */
+#global-nav .btn-sm {
+  white-space: nowrap;
+  background: rgba(61,56,96,0.6);
+  border: 2px solid var(--color-dark-border);
+  color: var(--text-on-dark);
+  font-size: 0.75rem;
+  padding: 6px 12px;
+  min-height: 36px;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 0 #000;
+}
+
+#global-nav .btn-sm:hover {
+  background: rgba(107,63,30,0.6);
+  border-color: var(--color-wood-mid);
+  color: var(--color-gold);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 #000, var(--glow-gold);
+}
+
+#global-nav .btn-sm.active-nav {
+  background: linear-gradient(135deg, var(--color-wood-dark), #8b5e3c);
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+  font-weight: 900;
+  box-shadow: 0 2px 0 #000, var(--glow-gold);
+}
+
+/* ========================================================
+   6. 재사용 유틸리티 패널
+   ======================================================== */
+
+/* 나무 표지판 패널 */
+.panel-wood {
+  background: linear-gradient(135deg, #5c3317 0%, #7a4a27 30%, #6b3f1e 70%, #4a2810 100%);
+  border: 3px solid var(--color-gold);
+  border-radius: var(--radius-md);
+  box-shadow: 0 6px 0 #000, inset 0 1px 0 rgba(255,255,255,0.15), var(--glow-gold);
+  color: var(--color-gold-light);
+}
+
+/* 종이 팝업 패널 */
+.panel-paper {
+  background: linear-gradient(135deg, #fef9ec 0%, #fef3d0 100%);
+  border: 3px solid var(--color-paper-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 0 #7a5c1e, inset 0 1px 0 rgba(255,255,255,0.8);
+  color: #3d2800;
+}
+
+/* 픽셀 테두리 유틸리티 */
+.pixel-border {
+  border: 4px solid var(--color-gold);
+  border-radius: 0;
+  box-shadow:
+    inset 2px 2px 0 rgba(255,255,255,0.2),
+    inset -2px -2px 0 rgba(0,0,0,0.4),
+    0 4px 0 #000;
+}
+
+/* ========================================================
+   7. 버튼 컴포넌트 (게임 스타일)
    ======================================================== */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-weight: 600;
-  padding: 8px 16px;
-  border: 3px solid var(--border-color);
-  border-radius: var(--border-radius);
-  background-color: #ffffff;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 10px 18px;
+  border: 2px solid var(--color-gold);
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, #2d2a50 0%, #1a1830 100%);
   cursor: pointer;
-  box-shadow: 0 4px 0 var(--shadow);
+  box-shadow: 0 4px 0 #000, inset 0 1px 0 rgba(255,255,255,0.1);
   transform: translateY(0);
-  transition: transform 0.05s, box-shadow 0.05s, background-color 0.15s;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease, filter 0.15s ease;
   text-decoration: none;
-  color: var(--text-main);
+  color: var(--text-on-dark);
   outline: none;
+  position: relative;
+  overflow: hidden;
+  min-height: 44px;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 50%;
+  background: rgba(255,255,255,0.06);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  pointer-events: none;
+}
+
+.btn:hover {
+  filter: brightness(1.2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #000, var(--glow-gold);
 }
 
 .btn:active {
-  transform: translateY(4px);
-  box-shadow: 0 0 0 var(--shadow);
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #000;
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 3px;
+}
+
+/* 게임 스타일 버튼 (별도 클래스) */
+.btn-game {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  padding: 10px 16px;
+  min-height: 44px;
+  letter-spacing: 0.5px;
 }
 
 .btn-primary {
-  background-color: var(--primary);
+  background: linear-gradient(180deg, #14b884 0%, #0d8e66 100%);
+  border-color: #10b981;
   color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 0 #064e3b, 0 0 12px rgba(16,185,129,0.3);
 }
 .btn-primary:hover {
-  background-color: var(--primary-hover);
+  background: linear-gradient(180deg, #16c991 0%, #10b981 100%);
+  box-shadow: 0 6px 0 #064e3b, var(--glow-emerald);
+}
+.btn-primary:active {
+  box-shadow: 0 1px 0 #064e3b;
 }
 
 .btn-accent {
-  background-color: var(--accent);
-  color: var(--border-color);
+  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+  border-color: var(--color-gold);
+  color: #1a0d00;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+  box-shadow: 0 4px 0 #78350f, var(--glow-gold);
 }
 .btn-accent:hover {
-  background-color: var(--accent-hover);
+  background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
+  box-shadow: 0 6px 0 #78350f, var(--glow-gold);
+}
+.btn-accent:active {
+  box-shadow: 0 1px 0 #78350f;
 }
 
 .btn-danger {
-  background-color: var(--danger);
+  background: linear-gradient(180deg, #f87171 0%, #dc2626 100%);
+  border-color: #ef4444;
   color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 0 #7f1d1d;
 }
 .btn-danger:hover {
-  background-color: var(--danger-hover);
+  background: linear-gradient(180deg, #fc8181 0%, #ef4444 100%);
+  box-shadow: 0 6px 0 #7f1d1d, 0 0 12px rgba(239,68,68,0.4);
+}
+.btn-danger:active {
+  box-shadow: 0 1px 0 #7f1d1d;
 }
 
 .btn-sm {
-  padding: 4px 10px;
-  font-size: 0.8rem;
+  padding: 6px 12px;
+  font-size: 0.78rem;
   border-width: 2px;
-  box-shadow: 0 2px 0 var(--shadow);
+  box-shadow: 0 2px 0 #000;
+  min-height: 36px;
 }
 .btn-sm:active {
   transform: translateY(2px);
-  box-shadow: 0 0 0 var(--shadow);
+  box-shadow: 0 0 0 #000;
 }
 
+/* 상태 배지 (색+아이콘+텍스트 동시 표시) */
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1.5px solid currentColor;
+}
+.badge-status.success { color: var(--color-success); background: rgba(34,197,94,0.15); }
+.badge-status.warning { color: var(--color-warning); background: rgba(245,158,11,0.15); }
+.badge-status.danger  { color: var(--color-danger);  background: rgba(239,68,68,0.15); }
+.badge-status.info    { color: var(--color-info);    background: rgba(59,130,246,0.15); }
+
 /* ========================================================
-   로그인 화면
+   8. 로그인 화면
    ======================================================== */
 #screen-login {
-  max-width: 400px;
+  max-width: 440px;
   justify-content: center;
   align-content: center;
-  min-height: calc(100vh - 120px);
+  min-height: calc(100vh - 60px);
 }
 
 .login-card {
-  background: var(--panel-bg);
-  border: 4px solid var(--border-color);
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 8px 0 var(--shadow);
+  background: linear-gradient(160deg, #1e1c38 0%, #141228 100%);
+  border: 3px solid var(--color-gold);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: 0 8px 0 #000, var(--glow-gold), inset 0 1px 0 rgba(255,215,0,0.1);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 로그인 카드 빛나는 효과 */
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent 0%, rgba(255,215,0,0.03) 30%, transparent 60%);
+  animation: loginGlow 6s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes loginGlow {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .login-card h2 {
-  color: var(--border-color);
-  font-size: 1.5rem;
-  margin-bottom: 8px;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--color-gold);
+  font-size: 0.85rem;
+  text-shadow: var(--glow-gold);
+  line-height: 1.8;
+  margin-bottom: 4px;
 }
 
+/* 폼 그룹 */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -215,26 +500,46 @@ body {
 }
 
 .form-group label {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--border-color);
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--color-gold-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .form-input {
-  padding: 10px;
-  border: 3px solid var(--border-color);
-  border-radius: 8px;
+  padding: 11px 14px;
+  border: 2px solid var(--color-dark-border);
+  border-radius: var(--radius-md);
   font-size: 1rem;
+  font-family: 'Noto Sans KR', sans-serif;
   outline: none;
-  background-color: #fff;
+  background: rgba(15,14,26,0.8);
+  color: var(--text-on-dark);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-input:focus {
-  border-color: var(--primary);
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(255,215,0,0.2);
+}
+
+.form-input::placeholder {
+  color: var(--text-muted-dark);
+}
+
+/* select 스타일 */
+select.form-input {
+  cursor: pointer;
+}
+
+select.form-input option {
+  background: var(--color-dark-panel);
+  color: var(--text-on-dark);
 }
 
 /* ========================================================
-   마을 맵 & 집 꾸미기 (게임 뷰)
+   9. 마을 맵 & 집 꾸미기 (게임 뷰)
    ======================================================== */
 .game-container {
   display: flex;
@@ -247,11 +552,11 @@ body {
 
 .canvas-wrapper {
   position: relative;
-  border: 6px solid var(--border-color);
-  border-radius: 12px;
+  border: 4px solid var(--color-gold);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: 0 6px 0 var(--shadow);
-  background-color: #86efac; /* Green ground fallback */
+  box-shadow: 0 6px 0 #000, var(--glow-gold);
+  background-color: #1a3a1a;
   line-height: 0;
 }
 
@@ -260,7 +565,7 @@ canvas {
   display: block;
 }
 
-/* 가상 조이스틱 (모바일 터치용) */
+/* 가상 조이스틱 */
 .joystick-container {
   display: none;
   position: absolute;
@@ -269,10 +574,11 @@ canvas {
   z-index: 50;
   width: 100px;
   height: 100px;
-  background: rgba(255, 255, 255, 0.4);
-  border: 3px solid var(--border-color);
+  background: rgba(0,0,0,0.5);
+  border: 3px solid var(--color-gold);
   border-radius: 50%;
   touch-action: none;
+  box-shadow: var(--glow-gold);
 }
 
 .joystick-stick {
@@ -281,8 +587,9 @@ canvas {
   left: 30px;
   width: 40px;
   height: 40px;
-  background: var(--border-color);
+  background: radial-gradient(circle, var(--color-gold) 0%, var(--color-gold-dark) 100%);
   border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.8);
 }
 
 @media (max-width: 768px) {
@@ -295,22 +602,25 @@ canvas {
   position: absolute;
   bottom: 20px;
   right: 20px;
-  background: rgba(0,0,0,0.7);
-  color: white;
-  padding: 6px 12px;
+  background: rgba(26,24,48,0.95);
+  border: 2px solid var(--color-gold);
+  color: var(--color-gold);
+  padding: 6px 14px;
   border-radius: 20px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 700;
   pointer-events: none;
   animation: pulse 1.5s infinite;
+  box-shadow: var(--glow-gold);
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 0.3; }
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
 }
 
 /* ========================================================
-   마켓 UI
+   10. 마켓 UI (진열대 스타일)
    ======================================================== */
 .market-nav {
   display: flex;
@@ -322,71 +632,106 @@ canvas {
 
 .category-tabs {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   overflow-x: auto;
   padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.category-tabs::-webkit-scrollbar { display: none; }
+
+.category-tabs .btn-sm {
+  white-space: nowrap;
 }
 
 .item-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 14px;
 }
 
 .item-card {
-  background: white;
-  border: 3px solid var(--border-color);
-  border-radius: 12px;
-  padding: 12px;
-  box-shadow: 0 4px 0 var(--border-color);
+  background: linear-gradient(160deg, #1e1c38 0%, #141228 100%);
+  border: 2px solid var(--color-dark-border);
+  border-radius: var(--radius-md);
+  padding: 14px 12px;
+  box-shadow: 0 4px 0 #000;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  transition: transform 0.15s;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
   position: relative;
+  cursor: pointer;
 }
 
 .item-card:hover {
-  transform: scale(1.02);
+  transform: translateY(-3px);
+  border-color: var(--color-gold);
+  box-shadow: 0 6px 0 #000, var(--glow-gold);
+}
+
+.item-card:hover::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-gold);
+  pointer-events: none;
+  animation: cardGlow 1s ease-in-out infinite alternate;
+}
+
+@keyframes cardGlow {
+  from { opacity: 0.6; }
+  to   { opacity: 1; }
 }
 
 .item-sprite-box {
-  width: 64px;
-  height: 64px;
-  background: #f1f5f9;
-  border: 2px dashed #cbd5e1;
-  border-radius: 8px;
+  width: 70px;
+  height: 70px;
+  background: rgba(15,14,26,0.8);
+  border: 2px solid var(--color-dark-border);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.item-sprite-box::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,215,0,0.05) 0%, transparent 50%);
 }
 
 .item-name {
   font-weight: 700;
-  font-size: 1rem;
-  margin-bottom: 4px;
+  font-size: 0.9rem;
+  color: var(--text-on-dark);
+  margin-bottom: 6px;
 }
 
 .item-price {
-  font-weight: 800;
-  color: #b45309;
-  font-size: 0.95rem;
-  margin-bottom: 8px;
+  font-weight: 900;
+  color: var(--color-gold);
+  font-size: 0.9rem;
+  margin-bottom: 6px;
   display: flex;
   align-items: center;
   gap: 4px;
+  text-shadow: var(--glow-gold);
 }
 
 .item-stock {
-  font-size: 0.8rem;
-  color: var(--text-muted);
+  font-size: 0.75rem;
+  color: var(--text-muted-dark);
   margin-bottom: 12px;
 }
 
 /* ========================================================
-   관리자 패널 & 탭 구조
+   11. 관리자 패널 & 탭 구조
    ======================================================== */
 .admin-header {
   display: flex;
@@ -397,60 +742,86 @@ canvas {
 
 .admin-tabs {
   display: flex;
-  gap: 4px;
-  border-bottom: 4px solid var(--border-color);
-  padding-bottom: 0px;
-  margin-bottom: 16px;
+  gap: 3px;
+  border-bottom: 3px solid var(--color-gold);
+  padding-bottom: 0;
+  margin-bottom: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.admin-tabs::-webkit-scrollbar { display: none; }
 
 .admin-tab-btn {
-  padding: 10px 16px;
-  border: 3px solid var(--border-color);
+  padding: 10px 14px;
+  border: 2px solid var(--color-dark-border);
   border-bottom: none;
-  background: #e2e8f0;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  background: var(--color-dark-card);
+  border-radius: 8px 8px 0 0;
+  font-family: 'Noto Sans KR', sans-serif;
   font-weight: 600;
+  font-size: 0.82rem;
   cursor: pointer;
-  margin-bottom: -4px;
+  margin-bottom: -3px;
+  color: var(--text-muted-dark);
+  transition: all 0.15s;
+  white-space: nowrap;
+  min-height: 44px;
+}
+
+.admin-tab-btn:hover {
+  color: var(--text-on-dark);
+  border-color: var(--color-gold);
 }
 
 .admin-tab-btn.active {
-  background: white;
-  border-bottom: 4px solid white;
+  background: linear-gradient(180deg, #2d2a50 0%, #1a1830 100%);
+  border-color: var(--color-gold);
+  border-bottom: 3px solid var(--color-dark-panel);
+  color: var(--color-gold);
+  font-weight: 700;
   z-index: 10;
 }
 
 .tab-content {
   display: none;
-  background: white;
-  border: 4px solid var(--border-color);
-  border-radius: 0 0 12px 12px;
-  padding: 20px;
-  box-shadow: 0 6px 0 var(--shadow);
+  background: linear-gradient(160deg, #1a1830 0%, #141228 100%);
+  border: 2px solid var(--color-gold);
+  border-top: none;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  padding: 24px;
+  box-shadow: 0 6px 0 #000;
+  color: var(--text-on-dark);
 }
 
 .tab-content.active {
   display: block;
 }
 
+.tab-content h3 {
+  color: var(--color-gold);
+  font-size: 1rem;
+  margin-bottom: 12px;
+  text-shadow: var(--glow-gold);
+}
+
 /* ========================================================
-   UI 레이아웃 패널 (기타 화면용 공통)
+   12. 공통 패널 컴포넌트
    ======================================================== */
 .panel {
-  background: var(--panel-bg);
-  border: 4px solid var(--border-color);
-  border-radius: 16px;
+  background: linear-gradient(160deg, #1a1830 0%, #141228 100%);
+  border: 2px solid var(--color-gold);
+  border-radius: var(--radius-lg);
   padding: 20px;
-  box-shadow: 0 6px 0 var(--shadow);
+  box-shadow: 0 6px 0 #000, inset 0 1px 0 rgba(255,215,0,0.05);
   display: flex;
   flex-direction: column;
   gap: 16px;
+  color: var(--text-on-dark);
 }
 
 .panel-header {
-  border-bottom: 3px solid var(--border-color);
-  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-gold);
+  padding-bottom: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -458,15 +829,18 @@ canvas {
 
 .panel-title {
   font-weight: 800;
-  font-size: 1.25rem;
-  color: var(--border-color);
+  font-size: 1.1rem;
+  color: var(--color-gold);
+  text-shadow: var(--glow-gold);
+  letter-spacing: 0.5px;
 }
 
 /* ========================================================
-   테이블 스타일
+   13. 테이블 스타일
    ======================================================== */
 .table-container {
   overflow-x: auto;
+  border-radius: var(--radius-md);
 }
 
 table {
@@ -477,21 +851,34 @@ table {
 
 th, td {
   padding: 10px 12px;
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--color-dark-border);
   text-align: left;
+  font-size: 0.88rem;
 }
 
 th {
-  background-color: var(--accent-light);
+  background: linear-gradient(180deg, #2d2a50 0%, #221f3a 100%);
+  color: var(--color-gold);
   font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 tr:nth-child(even) {
-  background-color: #f8fafc;
+  background: rgba(61,56,96,0.2);
+}
+
+tr:hover {
+  background: rgba(255,215,0,0.05);
+}
+
+td {
+  color: var(--text-on-dark);
 }
 
 /* ========================================================
-   모달 (팝업창)
+   14. 모달 (RPG 팝업창)
    ======================================================== */
 .modal-overlay {
   position: fixed;
@@ -499,7 +886,8 @@ tr:nth-child(even) {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(4px);
   display: none;
   justify-content: center;
   align-items: center;
@@ -511,46 +899,51 @@ tr:nth-child(even) {
 }
 
 .modal {
-  background: white;
-  border: 4px solid var(--border-color);
-  border-radius: 16px;
+  background: linear-gradient(160deg, #1e1c38 0%, #141228 100%);
+  border: 3px solid var(--color-gold);
+  border-radius: var(--radius-lg);
   width: 90%;
-  max-width: 450px;
-  box-shadow: 0 8px 0 var(--shadow);
+  max-width: 460px;
+  box-shadow: 0 8px 0 #000, var(--glow-gold);
   overflow: hidden;
   animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  color: var(--text-on-dark);
 }
 
 @keyframes popIn {
-  0% { transform: scale(0.8); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0%   { transform: scale(0.75); opacity: 0; }
+  100% { transform: scale(1);    opacity: 1; }
 }
 
 .modal-header {
-  background: var(--accent-light);
-  padding: 12px 16px;
-  border-bottom: 3px solid var(--border-color);
+  background: linear-gradient(180deg, #2d2a50 0%, #1e1c38 100%);
+  padding: 14px 18px;
+  border-bottom: 2px solid var(--color-gold);
   font-weight: 800;
-  color: var(--border-color);
+  color: var(--color-gold);
+  font-size: 0.95rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  text-shadow: var(--glow-gold);
 }
 
 .modal-body {
-  padding: 16px;
+  padding: 20px 18px;
+  color: var(--text-on-dark);
+  line-height: 1.6;
 }
 
 .modal-footer {
-  padding: 12px 16px;
-  border-top: 2px dashed var(--border-color);
+  padding: 14px 18px;
+  border-top: 1px solid var(--color-dark-border);
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 10px;
 }
 
 /* ========================================================
-   글로벌 로딩 오버레이
+   15. 글로벌 로딩 오버레이 (픽셀 스피너)
    ======================================================== */
 .global-loader {
   position: fixed;
@@ -558,90 +951,255 @@ tr:nth-child(even) {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(15,14,26,0.85);
+  backdrop-filter: blur(4px);
   display: none;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 9999;
+  gap: 16px;
 }
 
 .global-loader.active {
   display: flex;
 }
 
+/* 픽셀 스피너 */
 .spinner {
   width: 48px;
   height: 48px;
-  border: 6px solid var(--primary-light);
-  border-top: 6px solid var(--primary);
+  border: 4px solid rgba(255,215,0,0.2);
+  border-top: 4px solid var(--color-gold);
+  border-right: 4px solid var(--color-gold);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 12px;
+  animation: spin 0.7s linear infinite;
+  box-shadow: var(--glow-gold);
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
+  0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
 .loader-text {
-  font-weight: 700;
-  color: var(--border-color);
-  font-size: 1rem;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: var(--color-gold);
+  text-shadow: var(--glow-gold);
+  animation: blink 1s step-end infinite;
+  letter-spacing: 2px;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
 }
 
 /* ========================================================
-   수확 모달 및 리워드 이펙트
+   16. 수확 보상 애니메이션
    ======================================================== */
 .reward-anim-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   padding: 16px;
 }
 
 .reward-sprite-container {
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 4px dashed var(--accent);
+  border: 3px solid var(--color-gold);
   border-radius: 50%;
-  background: #fef9c3;
-  animation: bounce 0.6s infinite alternate;
+  background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, rgba(15,14,26,0.9) 70%);
+  animation: bounce 0.55s infinite alternate;
+  box-shadow: var(--glow-gold);
 }
 
 @keyframes bounce {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-10px); }
+  0%   { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-10px) scale(1.05); }
 }
 
-/* 리스트 항목 데코 */
+/* ========================================================
+   17. 리스트 아이템
+   ======================================================== */
 .list-item {
-  background: white;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  padding: 10px 12px;
+  background: linear-gradient(160deg, #1a1830 0%, #141228 100%);
+  border: 2px solid var(--color-dark-border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  color: var(--text-on-dark);
+}
+
+.list-item:hover {
+  border-color: var(--color-gold);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
 .list-item.pinned {
-  border-color: var(--accent);
-  background-color: var(--accent-light);
+  border-color: var(--color-amber);
+  background: linear-gradient(160deg, #1f1800 0%, #141000 100%);
+  box-shadow: 0 0 8px rgba(251,191,36,0.2);
 }
 
 .list-item-title {
   font-weight: 700;
+  color: var(--text-on-dark);
+  font-size: 0.95rem;
 }
 
 .list-item-meta {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-top: 2px;
+  font-size: 0.78rem;
+  color: var(--text-muted-dark);
+  margin-top: 3px;
+}
+
+/* text-muted 호환 */
+.text-muted {
+  color: var(--text-muted-dark);
+}
+
+/* ========================================================
+   18. 추가 UI 보완 (안내 문구, 인벤토리 등)
+   ======================================================== */
+
+/* 인벤토리 아이템 배지 */
+#inventory-list .list-item {
+  gap: 14px;
+}
+
+/* 빈 상태 안내 */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.empty-state .empty-icon {
+  font-size: 3rem;
+  filter: grayscale(0.5);
+}
+
+.empty-state p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* 미션/공지 게시판 스타일 */
+#missions-list .list-item,
+#announcements-list .list-item {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* 스크롤바 전역 스타일 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15,14,26,0.8);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-dark-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold);
+}
+
+/* ========================================================
+   19. 반응형 보정
+   ======================================================== */
+@media (max-width: 768px) {
+  .logo-text {
+    font-size: 0.65rem;
+  }
+
+  .status-bar {
+    gap: 6px;
+  }
+
+  .badge {
+    padding: 4px 8px;
+    font-size: 0.72rem;
+  }
+
+  .screen {
+    padding: 10px;
+  }
+
+  .panel {
+    padding: 14px;
+  }
+
+  .item-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+
+  .admin-tab-btn {
+    padding: 8px 10px;
+    font-size: 0.75rem;
+  }
+
+  .btn {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-text {
+    font-size: 0.55rem;
+  }
+
+  .status-bar .badge:not(.balance) {
+    display: none; /* 매우 좁은 화면에선 코인 배지만 표시 */
+  }
+
+  .item-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .login-card {
+    padding: 20px 16px;
+  }
+
+  .login-card h2 {
+    font-size: 0.65rem;
+  }
+}
+
+/* ========================================================
+   20. 포커스 접근성
+   ======================================================== */
+*:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255,215,0,0.2);
 }

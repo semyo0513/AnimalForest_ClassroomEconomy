@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🏘️ 우리반 마을 - 학급 경제 월드</title>
-  <meta name="description" content="동물의 숲 스타일의 2D 픽셀 기반 학급 경제 게임 웹 애플리케이션입니다.">
+  <title>⚔️ 우리반 마을 - 학급 경제 월드</title>
+  <meta name="description" content="액션 RPG 스타일의 픽셀 기반 학급 경제 게임 웹 애플리케이션입니다.">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -14,7 +14,7 @@
        ======================================================== -->
   <div id="global-loader" class="global-loader">
     <div class="spinner"></div>
-    <div class="loader-text">서버와 통신하는 중...</div>
+    <div class="loader-text">서버 통신중...</div>
   </div>
 
   <!-- ========================================================
@@ -24,31 +24,37 @@
     <div class="modal">
       <div class="modal-header">
         <span id="modal-title">알림</span>
+        <span style="font-size:1.2rem; opacity:0.6;">🔔</span>
       </div>
       <div class="modal-body" id="modal-body">
         <!-- 동적 삽입 -->
       </div>
       <div class="modal-footer">
-        <button id="modal-btn-cancel" class="btn btn-sm">취소</button>
+        <button id="modal-btn-cancel" class="btn btn-sm btn-danger">취소</button>
         <button id="modal-btn-confirm" class="btn btn-sm btn-primary">확인</button>
       </div>
     </div>
   </div>
 
   <!-- ========================================================
-       메인 헤더 및 글로벌 네비게이션
+       메인 헤더 & 게임 HUD
        ======================================================== -->
   <header id="main-header" class="game-header" style="display: none;">
+    <!-- 로고 영역 -->
     <div class="logo-container">
-      <span class="logo-text">🏘️ 우리반 마을</span>
+      <span style="font-size:1.4rem;">⚔️</span>
+      <span class="logo-text">우리반 마을</span>
     </div>
-    
+
+    <!-- HUD 상태바 -->
     <div class="status-bar">
-      <!-- 역할 배지 -->
-      <span id="header-user-role" class="badge">주민</span>
+      <!-- 역할 배지 (JS가 텍스트를 삽입하는 id 유지) -->
+      <span id="header-user-role" class="badge" style="border-color:#a78bfa; color:#a78bfa; background:rgba(167,139,250,0.1);">
+        주민
+      </span>
       <!-- 닉네임 배지 -->
-      <span class="badge" style="background:#e0f2fe; border-color:#0284c7;">
-        👤 <span id="header-user-name">로딩중</span> 님
+      <span class="badge" style="border-color:#38bdf8; color:#38bdf8; background:rgba(56,189,248,0.1);">
+        👤 <span id="header-user-name">로딩중</span>
       </span>
       <!-- 코인 잔액 배지 -->
       <span class="badge balance">
@@ -58,16 +64,16 @@
   </header>
 
   <!-- 글로벌 네비게이션 툴바 (헤더 아래 붙음) -->
-  <nav id="global-nav" class="game-header" style="display: none; padding: 6px 16px; background: #fffbeb; border-top: none;">
-    <div style="display: flex; gap: 8px; overflow-x: auto; width: 100%; justify-content: center;">
-      <a href="#village" id="nav-village" class="btn btn-sm btn-accent">🏡 마을 가기</a>
-      <a href="#my-house" id="nav-house" class="btn btn-sm btn-accent">🖼️ 내 방 꾸미기</a>
-      <a href="#market" id="nav-market" class="btn btn-sm btn-accent">🛒 마켓 상점</a>
-      <a href="#missions" id="nav-missions" class="btn btn-sm btn-accent">🎯 미션 게시판</a>
-      <a href="#announcements" id="nav-announcements" class="btn btn-sm btn-accent">📢 마을 소식</a>
-      <a href="#inventory" id="nav-inventory" class="btn btn-sm btn-accent">🎒 보관함</a>
-      <a href="#admin" id="nav-admin" class="btn btn-sm btn-primary" style="display: none;">👮 관리자 콘솔</a>
-      <a href="#login" id="nav-logout" class="btn btn-sm btn-danger">🚪 로그아웃</a>
+  <nav id="global-nav" class="game-header" style="display: none; padding: 6px 16px; background: #13112a; border-top: none;">
+    <div style="display: flex; gap: 6px; overflow-x: auto; width: 100%; justify-content: center;">
+      <a href="#village"       id="nav-village"        class="btn btn-sm btn-accent">🏡 마을</a>
+      <a href="#my-house"      id="nav-house"          class="btn btn-sm btn-accent">🖼️ 내 방</a>
+      <a href="#market"        id="nav-market"         class="btn btn-sm btn-accent">🛒 마켓</a>
+      <a href="#missions"      id="nav-missions"        class="btn btn-sm btn-accent">🎯 미션</a>
+      <a href="#announcements" id="nav-announcements"  class="btn btn-sm btn-accent">📢 소식</a>
+      <a href="#inventory"     id="nav-inventory"      class="btn btn-sm btn-accent">🎒 보관함</a>
+      <a href="#admin"         id="nav-admin"          class="btn btn-sm btn-primary" style="display: none;">👮 관리</a>
+      <a href="#login"         id="nav-logout"         class="btn btn-sm btn-danger">🚪 로그아웃</a>
     </div>
   </nav>
 
@@ -76,9 +82,19 @@
        ======================================================== -->
   <section id="screen-login" class="screen active">
     <div class="login-card">
-      <h2>🏘️ 우리반 마을 로그인</h2>
-      <p style="color:var(--text-muted); font-size:0.9rem;">학번(ID)과 비밀번호(PIN)를 입력하고 마을에 입주하세요!</p>
-      
+
+      <!-- 픽셀 캐릭터 데코 (순수 장식) -->
+      <div style="display:flex; justify-content:center; gap:12px; margin-bottom:4px;" aria-hidden="true">
+        <span style="font-size:2rem; animation: bounce 1.2s infinite alternate; display:inline-block;">🧙</span>
+        <span style="font-size:2rem; animation: bounce 1.2s 0.3s infinite alternate; display:inline-block;">⚔️</span>
+        <span style="font-size:2rem; animation: bounce 1.2s 0.6s infinite alternate; display:inline-block;">🛡️</span>
+      </div>
+
+      <h2>우리반 마을<br>로그인</h2>
+      <p style="color:var(--text-muted-dark); font-size:0.85rem; line-height:1.6;">
+        학번(ID)과 비밀번호(PIN)를 입력하고<br>마을에 입주하세요!
+      </p>
+
       <form id="login-form" onsubmit="event.preventDefault(); (async()=>{
         const id = document.getElementById('login-id').value.trim();
         const pin = document.getElementById('login-pin').value.trim();
@@ -91,23 +107,25 @@
           App.modal.alert('로그인 실패 ❌', res.error);
         }
       })()">
-        <div class="form-group" style="margin-bottom: 12px;">
+        <div class="form-group" style="margin-bottom: 14px;">
           <label for="login-id">학번 또는 교사 ID</label>
           <input type="text" id="login-id" class="form-input" placeholder="예: 20101 또는 teacher" required>
         </div>
-        
-        <div class="form-group" style="margin-bottom: 16px;">
+
+        <div class="form-group" style="margin-bottom: 18px;">
           <label for="login-pin">비밀번호 (PIN)</label>
-          <input type="password" id="login-pin" class="form-input" placeholder="비밀번호" required>
+          <input type="password" id="login-pin" class="form-input" placeholder="비밀번호 입력" required>
         </div>
-        
-        <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 12px;">
-          마을 입주하기 🔑
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1rem; padding: 14px;">
+          ⚔️ 마을 입주하기
         </button>
       </form>
 
-      <div style="margin-top:16px; text-align:center; border-top: 2px dashed #e2e8f0; padding-top:16px;">
-        <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px;">처음 오셨나요? 선생님께 초대코드를 받아 가입하세요!</p>
+      <div style="margin-top:4px; border-top: 2px solid var(--color-dark-border); padding-top:16px;">
+        <p style="font-size:0.82rem; color:var(--text-muted-dark); margin-bottom:10px;">
+          처음 오셨나요? 선생님께 초대코드를 받아 가입하세요!
+        </p>
         <button onclick="window.location.hash='#signup'" class="btn btn-accent" style="width:100%;">
           ✨ 신규 주민 회원가입
         </button>
@@ -122,13 +140,13 @@
     <div class="game-container">
       <div class="panel-header" style="width:100%;">
         <span class="panel-title">🌳 우리반 마을 광장</span>
-        <span class="text-muted" style="font-size:0.9rem;">WASD / 방향키로 움직이고 문/상대 앞에서 E키를 눌러 대화/입장하세요.</span>
+        <span class="text-muted" style="font-size:0.82rem;">WASD / 방향키 이동 · E키 상호작용</span>
       </div>
 
       <div class="canvas-wrapper">
         <!-- 2D Canvas -->
         <canvas id="village-canvas"></canvas>
-        
+
         <!-- 가상 조이스틱 (모바일 대응) -->
         <div id="joystick-container" class="joystick-container">
           <div id="joystick-stick" class="joystick-stick"></div>
@@ -147,7 +165,7 @@
     <div class="panel">
       <div class="panel-header">
         <span class="panel-title">🖼️ 내 방 인테리어 꾸미기</span>
-        <button id="house-btn-save" class="btn btn-primary btn-sm">💾 인테리어 저장하기</button>
+        <button id="house-btn-save" class="btn btn-primary btn-sm">💾 저장하기</button>
       </div>
 
       <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;">
@@ -156,25 +174,28 @@
           <canvas id="house-canvas"></canvas>
         </div>
 
-        <!-- 편집 사이드 바 -->
-        <div id="house-edit-panel" style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 16px;">
-          <div style="border: 2px solid var(--border-color); border-radius: 8px; padding: 12px; background: white;">
-            <h4 style="color:var(--border-color); margin-bottom:8px;">🎨 인테리어 모드 선택</h4>
-            
-            <div class="form-group" style="margin-bottom:8px;">
+        <!-- 편집 사이드바 -->
+        <div id="house-edit-panel" style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="border: 2px solid var(--color-dark-border); border-radius: var(--radius-md); padding: 14px; background: rgba(15,14,26,0.6);">
+            <h4 style="color:var(--color-gold); margin-bottom:10px; font-size:0.88rem;">🎨 인테리어 모드 선택</h4>
+
+            <div class="form-group" style="margin-bottom:10px;">
               <label>배치할 가구 (보관함)</label>
               <select id="house-furniture-select" class="form-input"></select>
             </div>
-            
+
             <button id="house-btn-delete-mode" class="btn btn-sm btn-danger" style="width:100%; margin-bottom:8px;">
-              가구 회수하기
+              🗑️ 가구 회수하기
             </button>
-            <p style="font-size:0.8rem; color:var(--text-muted);">* 가구 배치 모드 중에는 가구 선택 후 바닥을 클릭하고, 회수 모드 중에는 바닥의 가구를 클릭하세요.</p>
+            <p style="font-size:0.76rem; color:var(--text-muted-dark); line-height:1.5;">
+              * 배치 모드: 가구 선택 후 바닥 클릭<br>
+              * 회수 모드: 배치된 가구 클릭
+            </p>
           </div>
 
-          <div style="border: 2px solid var(--border-color); border-radius: 8px; padding: 12px; background: white;">
-            <h4 style="color:var(--border-color); margin-bottom:8px;">🏠 벽지 및 바닥지</h4>
-            <div class="form-group" style="margin-bottom:8px;">
+          <div style="border: 2px solid var(--color-dark-border); border-radius: var(--radius-md); padding: 14px; background: rgba(15,14,26,0.6);">
+            <h4 style="color:var(--color-gold); margin-bottom:10px; font-size:0.88rem;">🏠 벽지 및 바닥지</h4>
+            <div class="form-group" style="margin-bottom:10px;">
               <label>벽 테마 선택</label>
               <select id="house-wall-select" class="form-input">
                 <option value="wall_default">기본 회색 벽</option>
@@ -197,13 +218,13 @@
         </div>
       </div>
 
-      <!-- 게시판 / 방명록 한줄 선언 -->
-      <div style="border:3px solid var(--border-color); border-radius:12px; padding:16px; background:#fff;">
-        <h4 id="house-memo-title" style="color:var(--border-color); margin-bottom:8px;">🏡 알림 방명록</h4>
-        <div id="house-memo-text" style="font-size:0.95rem; margin-bottom:12px; line-height:1.4;"></div>
-        
+      <!-- 방명록 / 알림 메모 -->
+      <div style="border:2px solid var(--color-dark-border); border-radius:var(--radius-md); padding:16px; background:rgba(15,14,26,0.6);">
+        <h4 id="house-memo-title" style="color:var(--color-gold); margin-bottom:10px; font-size:0.88rem;">🏡 알림 방명록</h4>
+        <div id="house-memo-text" style="font-size:0.9rem; margin-bottom:12px; line-height:1.5; color:var(--text-on-dark);"></div>
+
         <div style="display:flex; gap:8px;">
-          <input type="text" id="house-memo-input" class="form-input" style="flex:1;" placeholder="내 집을 방문한 주민들에게 띄울 알림글을 쓰세요 (최대 50자)">
+          <input type="text" id="house-memo-input" class="form-input" style="flex:1;" placeholder="방문 주민들에게 보낼 메시지 (최대 50자)">
           <button id="house-btn-memo-submit" class="btn btn-accent">작성</button>
         </div>
       </div>
@@ -223,19 +244,17 @@
       <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;">
         <div class="canvas-wrapper">
           <canvas id="visit-house-canvas" style="display: none;"></canvas>
-          <!-- 하우스 캔버스를 재사용하기 위해 js에서 canvas 바인딩 처리를 유연하게 유도 -->
         </div>
 
-        <div style="flex:1; display:flex; flex-direction:column; gap:16px; min-width:250px;">
-          <!-- 방명록 메모 상자 -->
-          <div style="border:3px solid var(--border-color); border-radius:12px; padding:16px; background:#fff; height:100%;">
-            <h4 id="visit-house-memo-title" style="color:var(--border-color); margin-bottom:8px;">🏡 주민 알림 방명록</h4>
-            <div id="visit-house-memo-text" style="font-size:1rem; margin-bottom:16px; padding:12px; background:#fffbeb; border:2px dashed var(--border-color); border-radius:8px; line-height:1.5;">
+        <div style="flex:1; display:flex; flex-direction:column; gap:14px; min-width:250px;">
+          <div style="border:2px solid var(--color-dark-border); border-radius:var(--radius-md); padding:16px; background:rgba(15,14,26,0.6);">
+            <h4 id="visit-house-memo-title" style="color:var(--color-gold); margin-bottom:10px; font-size:0.88rem;">🏡 주민 알림 방명록</h4>
+            <div id="visit-house-memo-text" style="font-size:0.9rem; margin-bottom:14px; padding:12px; background:rgba(255,215,0,0.05); border:1px solid var(--color-dark-border); border-radius:var(--radius-sm); line-height:1.6; color:var(--text-on-dark);">
               로딩중...
             </div>
-            
+
             <div style="display:flex; flex-direction:column; gap:8px;">
-              <label style="font-weight:600; font-size:0.9rem; color:var(--text-muted);">이 집에 따뜻한 한 줄 방명록을 남겨주세요!</label>
+              <label style="font-weight:600; font-size:0.84rem; color:var(--text-muted-dark);">이 집에 따뜻한 방명록을 남겨주세요!</label>
               <div style="display:flex; gap:8px;">
                 <input type="text" id="visit-house-memo-input" class="form-input" style="flex:1;" placeholder="방명록 남기기...">
                 <button id="visit-house-btn-memo-submit" class="btn btn-accent">남기기</button>
@@ -248,7 +267,7 @@
   </section>
 
   <!-- ========================================================
-       5. 마켓 스크린
+       5. 마켓 스크린 (진열대 상점)
        ======================================================== -->
   <section id="screen-market" class="screen">
     <div class="panel">
@@ -259,11 +278,11 @@
       <!-- 카테고리 필터 탭 -->
       <div class="market-nav">
         <div class="category-tabs">
-          <button class="btn btn-sm btn-primary market-category-tab" data-category="all">전체 상품</button>
-          <button class="btn btn-sm market-category-tab" data-category="furniture">가구</button>
-          <button class="btn btn-sm market-category-tab" data-category="wallpaper">벽지</button>
-          <button class="btn btn-sm market-category-tab" data-category="flooring">바닥</button>
-          <button class="btn btn-sm market-category-tab" data-category="harvest">수확물</button>
+          <button class="btn btn-sm btn-primary market-category-tab" data-category="all">🗂️ 전체</button>
+          <button class="btn btn-sm market-category-tab" data-category="furniture">🪑 가구</button>
+          <button class="btn btn-sm market-category-tab" data-category="wallpaper">🖼️ 벽지</button>
+          <button class="btn btn-sm market-category-tab" data-category="flooring">🟫 바닥</button>
+          <button class="btn btn-sm market-category-tab" data-category="harvest">🌾 수확물</button>
         </div>
       </div>
 
@@ -273,19 +292,19 @@
       </div>
 
       <!-- 마켓운영자 전용 물품 관리 패널 -->
-      <div id="market-manager-panel" style="display: none; border-top:4px dashed var(--border-color); margin-top:24px; padding-top:20px;">
-        <h3 style="color:var(--border-color); margin-bottom:12px;">👮 마켓 운영자 전용: 상품 관리 콘솔</h3>
-        
+      <div id="market-manager-panel" style="display: none; border-top:2px solid var(--color-dark-border); margin-top:24px; padding-top:20px;">
+        <h3 style="color:var(--color-gold); margin-bottom:14px; font-size:0.95rem;">👮 마켓 운영자 전용: 상품 관리 콘솔</h3>
+
         <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start;">
-          <!-- 등록 / 수정 폼 -->
-          <form id="market-form-item" style="flex:1; min-width:280px; display:flex; flex-direction:column; gap:8px; border:2px solid var(--border-color); border-radius:8px; padding:16px; background:#fff;">
+          <!-- 등록/수정 폼 -->
+          <form id="market-form-item" style="flex:1; min-width:280px; display:flex; flex-direction:column; gap:8px; border:2px solid var(--color-dark-border); border-radius:var(--radius-md); padding:16px; background:rgba(15,14,26,0.6);">
             <input type="hidden" id="market-input-id">
-            
+
             <div class="form-group">
               <label>상품 이름</label>
               <input type="text" id="market-input-name" class="form-input" required placeholder="예: 원목 책상">
             </div>
-            
+
             <div class="form-group">
               <label>카테고리</label>
               <select id="market-input-category" class="form-input">
@@ -309,7 +328,7 @@
 
             <div style="display:flex; gap:8px; margin-top:8px;">
               <button type="button" id="market-btn-form-reset" class="btn btn-sm" style="flex:1;">초기화</button>
-              <button type="submit" class="btn btn-sm btn-primary" style="flex:2;">신규 상품 등록하기</button>
+              <button type="submit" class="btn btn-sm btn-primary" style="flex:2;">신규 상품 등록</button>
             </div>
           </form>
 
@@ -337,16 +356,18 @@
   </section>
 
   <!-- ========================================================
-       6. 미션 스크린
+       6. 미션 스크린 (퀘스트 게시판)
        ======================================================== -->
   <section id="screen-missions" class="screen">
     <div class="panel">
       <div class="panel-header">
         <span class="panel-title">🎯 마을 미션 게시판</span>
       </div>
-      <p style="color:var(--text-muted); font-size:0.9rem;">학급 미션을 완수하고 코인을 보상받으세요!</p>
+      <p style="color:var(--text-muted-dark); font-size:0.88rem;">
+        ⚔️ 학급 미션을 완수하고 코인 보상을 획득하세요!
+      </p>
 
-      <div id="missions-list" style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">
+      <div id="missions-list" style="display:flex; flex-direction:column; gap:10px; margin-top:4px;">
         <!-- JS 동적 렌더링 -->
       </div>
     </div>
@@ -362,8 +383,8 @@
       </div>
 
       <!-- 교사 전용 공지 올리기 폼 -->
-      <div id="ann-teacher-panel" style="display:none; border:2px solid var(--border-color); border-radius:12px; padding:16px; background:#fff; margin-bottom:16px;">
-        <h4 style="color:var(--border-color); margin-bottom:12px;">선생님 공지사항 작성란</h4>
+      <div id="ann-teacher-panel" style="display:none; border:2px solid var(--color-dark-border); border-radius:var(--radius-md); padding:16px; background:rgba(15,14,26,0.6); margin-bottom:8px;">
+        <h4 style="color:var(--color-gold); margin-bottom:12px; font-size:0.88rem;">📝 선생님 공지사항 작성란</h4>
         <form id="ann-form-post" style="display:flex; flex-direction:column; gap:8px;">
           <div class="form-group">
             <label>제목</label>
@@ -371,19 +392,19 @@
           </div>
           <div class="form-group">
             <label>본문 내용</label>
-            <textarea id="ann-input-content" class="form-input" rows="3" placeholder="공지할 본문 세부 내용을 쓰세요" required></textarea>
+            <textarea id="ann-input-content" class="form-input" rows="3" placeholder="공지할 내용을 입력하세요" required></textarea>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-            <label style="display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
-              <input type="checkbox" id="ann-input-pinned"> 📌 중요 공지로 상단 고정 (접속시 자동 팝업)
+            <label style="display:inline-flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-on-dark); font-size:0.88rem;">
+              <input type="checkbox" id="ann-input-pinned" style="accent-color:var(--color-gold);"> 📌 중요 공지로 상단 고정
             </label>
-            <button type="submit" class="btn btn-primary">공지 올리기</button>
+            <button type="submit" class="btn btn-primary btn-sm">공지 올리기</button>
           </div>
         </form>
       </div>
 
       <!-- 공지 리스트 -->
-      <div id="announcements-list" style="display:flex; flex-direction:column; gap:12px;">
+      <div id="announcements-list" style="display:flex; flex-direction:column; gap:10px;">
         <!-- JS 동적 렌더링 -->
       </div>
     </div>
@@ -397,9 +418,11 @@
       <div class="panel-header">
         <span class="panel-title">🎒 나의 보관함 (인벤토리)</span>
       </div>
-      <p style="color:var(--text-muted); font-size:0.9rem;">마켓에서 구매한 인테리어 가구와 수확한 활동 전리품 목록입니다.</p>
+      <p style="color:var(--text-muted-dark); font-size:0.88rem;">
+        마켓에서 구매한 인테리어 가구와 수확한 활동 전리품 목록입니다.
+      </p>
 
-      <div id="inventory-list" style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">
+      <div id="inventory-list" style="display:flex; flex-direction:column; gap:8px; margin-top:4px;">
         <!-- JS 동적 렌더링 -->
       </div>
     </div>
@@ -410,28 +433,28 @@
        ======================================================== -->
   <section id="screen-admin" class="screen">
     <div class="admin-header">
-      <h2 style="color:var(--border-color);">👮 직업 행정 통합 콘솔</h2>
-      <span class="text-muted">귀하의 직업 권한에 맞춰 행정 명령 탭이 활성화됩니다.</span>
+      <h2 style="color:var(--color-gold); font-size:1.1rem; text-shadow:var(--glow-gold);">👮 직업 행정 통합 콘솔</h2>
+      <span class="text-muted" style="font-size:0.84rem;">직업 권한에 맞춰 탭이 활성화됩니다</span>
     </div>
 
     <!-- 탭 가로 헤더 -->
     <div class="admin-tabs">
       <button class="admin-tab-btn active" id="admin-tab-salary" data-tab="salary">💵 월급 지급</button>
-      <button class="admin-tab-btn" id="admin-tab-tax" data-tab="tax">🏛️ 세금 징수</button>
+      <button class="admin-tab-btn" id="admin-tab-tax"     data-tab="tax">🏛️ 세금 징수</button>
       <button class="admin-tab-btn" id="admin-tab-penalty" data-tab="penalty">🚨 벌금 부과</button>
-      <button class="admin-tab-btn" id="admin-tab-register" data-tab="register">입주 등록</button>
-      <button class="admin-tab-btn" id="admin-tab-roles" data-tab="roles">역할 배정</button>
-      <button class="admin-tab-btn" id="admin-tab-mission" data-tab="mission">미션 생성</button>
-      <button class="admin-tab-btn" id="admin-tab-audit" data-tab="audit">🔍 거래 감사</button>
+      <button class="admin-tab-btn" id="admin-tab-register" data-tab="register">🏡 입주 등록</button>
+      <button class="admin-tab-btn" id="admin-tab-roles"   data-tab="roles">⚖️ 역할 배정</button>
+      <button class="admin-tab-btn" id="admin-tab-mission" data-tab="mission">🎯 미션 생성</button>
+      <button class="admin-tab-btn" id="admin-tab-audit"   data-tab="audit">🔍 거래 감사</button>
     </div>
 
-    <!-- 탭 1: 월급 지급 (월급담당관, 교사) -->
+    <!-- 탭 1: 월급 지급 -->
     <div class="tab-content active" id="admin-panel-salary">
       <h3>💵 월급 일괄 지급하기</h3>
-      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">월급을 줄 주민들을 다수 체크한 뒤 일괄 전송하세요.</p>
-      
+      <p style="color:var(--text-muted-dark); font-size:0.84rem; margin-bottom:14px;">월급을 줄 주민들을 다수 체크한 뒤 일괄 전송하세요.</p>
+
       <form id="admin-form-salary">
-        <div id="admin-salary-checklist" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:8px; max-height:220px; overflow-y:auto; border:2px solid var(--border-color); padding:10px; border-radius:8px; margin-bottom:12px; background:#fafafa;">
+        <div id="admin-salary-checklist" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:8px; max-height:220px; overflow-y:auto; border:2px solid var(--color-dark-border); padding:10px; border-radius:var(--radius-md); margin-bottom:14px; background:rgba(15,14,26,0.6);">
           <!-- 주민 체크박스 동적 생성 -->
         </div>
 
@@ -446,19 +469,19 @@
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="margin-top:12px; width:100%;">
-          급여 이체 및 송금 전송 💸
+        <button type="submit" class="btn btn-primary" style="margin-top:14px; width:100%;">
+          💸 급여 이체 및 송금 전송
         </button>
       </form>
     </div>
 
-    <!-- 탭 2: 세금 징수 (국세청장, 교사) -->
+    <!-- 탭 2: 세금 징수 -->
     <div class="tab-content" id="admin-panel-tax">
       <h3>🏛️ 국세 강제 징수 관리</h3>
-      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">세금을 징수할 주민들을 체크하세요. (잔액보다 많은 세금은 징수 불가능)</p>
-      
+      <p style="color:var(--text-muted-dark); font-size:0.84rem; margin-bottom:14px;">세금을 징수할 주민들을 체크하세요. (잔액보다 많은 세금은 징수 불가)</p>
+
       <form id="admin-form-tax">
-        <div id="admin-tax-checklist" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:8px; max-height:220px; overflow-y:auto; border:2px solid var(--border-color); padding:10px; border-radius:8px; margin-bottom:12px; background:#fafafa;">
+        <div id="admin-tax-checklist" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:8px; max-height:220px; overflow-y:auto; border:2px solid var(--color-dark-border); padding:10px; border-radius:var(--radius-md); margin-bottom:14px; background:rgba(15,14,26,0.6);">
           <!-- 주민 체크박스 동적 생성 -->
         </div>
 
@@ -473,19 +496,19 @@
           </div>
         </div>
 
-        <button type="submit" class="btn btn-danger" style="margin-top:12px; width:100%;">
-          세금 일제 원천 징수 실행 🧾
+        <button type="submit" class="btn btn-danger" style="margin-top:14px; width:100%;">
+          🧾 세금 일제 원천 징수 실행
         </button>
       </form>
     </div>
 
-    <!-- 탭 3: 벌금 부과 (경찰, 교사) -->
+    <!-- 탭 3: 벌금 부과 -->
     <div class="tab-content" id="admin-panel-penalty">
       <h3>🚨 벌금 부과 및 위반 딱지 발송</h3>
-      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">교실 위반 행위를 벌점으로 차감 고지합니다.</p>
-      
+      <p style="color:var(--text-muted-dark); font-size:0.84rem; margin-bottom:14px;">교실 위반 행위를 벌점으로 차감 고지합니다.</p>
+
       <form id="admin-form-penalty">
-        <div class="form-group" style="margin-bottom:10px;">
+        <div class="form-group" style="margin-bottom:12px;">
           <label>피부과 대상 주민</label>
           <select id="admin-penalty-user" class="form-input" required></select>
         </div>
@@ -501,8 +524,8 @@
           </div>
         </div>
 
-        <button type="submit" class="btn btn-danger" style="margin-top:12px; width:100%;">
-          경찰 딱지 발부 👮
+        <button type="submit" class="btn btn-danger" style="margin-top:14px; width:100%;">
+          👮 경찰 딱지 발부
         </button>
       </form>
     </div>
@@ -510,8 +533,8 @@
     <!-- 탭 4: 입주 등록 (교사전용) -->
     <div class="tab-content" id="admin-panel-register">
       <h3>🏡 신규 주민 입주 등록</h3>
-      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">신규 학생을 등록하면 기본 주택 데이터가 함께 자동 생성됩니다.</p>
-      
+      <p style="color:var(--text-muted-dark); font-size:0.84rem; margin-bottom:14px;">신규 학생을 등록하면 기본 주택 데이터가 자동 생성됩니다.</p>
+
       <form id="admin-form-register" style="max-width:400px; display:flex; flex-direction:column; gap:10px;">
         <div class="form-group">
           <label>입주 학번 ID</label>
@@ -525,15 +548,15 @@
           <label>입주 초기 PIN번호</label>
           <input type="text" id="admin-reg-pin" class="form-input" value="1234" required>
         </div>
-        <button type="submit" class="btn btn-primary" style="margin-top:8px;">새 주민 등록 및 주택 준공 승인 🏗️</button>
+        <button type="submit" class="btn btn-primary" style="margin-top:6px;">🏗️ 새 주민 등록 및 주택 준공 승인</button>
       </form>
     </div>
 
     <!-- 탭 5: 역할 배정 (교사전용) -->
     <div class="tab-content" id="admin-panel-roles">
       <h3>⚖️ 주민 직업 배정 목록</h3>
-      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">각 주민들에게 월급/마켓/세금/경찰 역할을 지정할 수 있습니다.</p>
-      
+      <p style="color:var(--text-muted-dark); font-size:0.84rem; margin-bottom:14px;">각 주민들에게 월급/마켓/세금/경찰 역할을 지정할 수 있습니다.</p>
+
       <div class="table-container">
         <table>
           <thead>
@@ -554,8 +577,8 @@
     <!-- 탭 6: 미션 생성 (교사전용) -->
     <div class="tab-content" id="admin-panel-mission">
       <h3>🎯 새 미션(과제) 하달</h3>
-      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">마을 전체 주민에게 새로운 미션을 제시하고 보상급을 설정합니다.</p>
-      
+      <p style="color:var(--text-muted-dark); font-size:0.84rem; margin-bottom:14px;">마을 전체 주민에게 새로운 미션을 제시하고 보상금을 설정합니다.</p>
+
       <form id="admin-form-mission" style="max-width:500px; display:flex; flex-direction:column; gap:10px;">
         <div class="form-group">
           <label>미션 상세 설명</label>
@@ -566,16 +589,16 @@
           <input type="number" id="admin-mis-reward" class="form-input" min="1" value="100" required>
         </div>
         <input type="hidden" id="admin-mis-target" value="all">
-        <button type="submit" class="btn btn-primary" style="margin-top:8px;">미션 게시판에 등록 및 전파 🎯</button>
+        <button type="submit" class="btn btn-primary" style="margin-top:6px;">🎯 미션 게시판에 등록 및 전파</button>
       </form>
     </div>
 
-    <!-- 탭 7: 최근 거래 감사 (전체 공무원 및 교사 공통) -->
+    <!-- 탭 7: 최근 거래 감사 -->
     <div class="tab-content" id="admin-panel-audit">
       <h3>🔍 주민 상세 금융거래 감사</h3>
-      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">주민을 선택하여 부당 거래, 세금 체납, 벌점 거래 역사를 감사합니다.</p>
-      
-      <div class="form-group" style="margin-bottom:12px;">
+      <p style="color:var(--text-muted-dark); font-size:0.84rem; margin-bottom:14px;">주민을 선택하여 부당 거래, 세금 체납, 벌점 거래 역사를 감사합니다.</p>
+
+      <div class="form-group" style="margin-bottom:14px;">
         <label>감사 대상 주민</label>
         <select id="admin-audit-user-select" class="form-input"></select>
       </div>
@@ -604,15 +627,15 @@
        10. 회원가입 스크린 (selfRegister - 교사 초대코드 인증)
        ======================================================== -->
   <section id="screen-signup" class="screen">
-    <div class="login-card" style="max-width: 450px; margin: 0 auto;">
-      <h2>✨ 우리반 마을 가입신청</h2>
-      <p style="color:var(--text-muted); font-size:0.9rem;">
-        선생님께 받은 <b>초대 코드</b>를 입력하고 마을 주민으로 등록되세요!
+    <div class="login-card" style="max-width: 460px; margin: 0 auto;">
+      <h2>✨ 마을 가입 신청</h2>
+      <p style="color:var(--text-muted-dark); font-size:0.84rem; line-height:1.6;">
+        선생님께 받은 <strong style="color:var(--color-gold);">초대 코드</strong>를 입력하고<br>마을 주민으로 등록되세요!
       </p>
 
       <!-- 초대코드 안내 박스 -->
-      <div style="background:#fef3c7; border:2px solid #f59e0b; border-radius:8px; padding:10px 14px; font-size:0.85rem; color:#78350f;">
-        🔑 <b>초대 코드</b>는 선생님의 관리자 PIN 번호입니다.<br>
+      <div style="background:rgba(255,215,0,0.08); border:2px solid var(--color-gold-dark); border-radius:var(--radius-md); padding:12px 16px; font-size:0.82rem; color:var(--color-gold-light); line-height:1.5;">
+        🔑 <strong>초대 코드</strong>는 선생님의 관리자 PIN 번호입니다.<br>
         선생님께 문의하거나 칠판/안내문에서 확인하세요.
       </div>
 
@@ -667,12 +690,12 @@
           <input type="password" id="signup-teacher-code" class="form-input" placeholder="선생님께 받은 초대 코드" required>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width:100%; padding:12px; font-size:1.05rem;">
+        <button type="submit" class="btn btn-primary" style="width:100%; padding:14px; font-size:1rem; margin-top:4px;">
           🏡 마을 주민 등록 신청하기
         </button>
       </form>
 
-      <div style="margin-top:12px; text-align:center;">
+      <div style="margin-top:8px; text-align:center;">
         <button onclick="window.location.hash='#login'" class="btn btn-sm" style="width:100%;">
           ← 로그인 화면으로 돌아가기
         </button>

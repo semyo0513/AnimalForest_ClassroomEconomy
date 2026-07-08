@@ -1,6 +1,10 @@
 // 🏘️ 우리반 마을 - API 클라이언트 (GAS 통신 및 로컬 모크 폴백)
 
 const API = {
+  // ── 성능 개선: 인메모리 캐시 (localStorage 반복 파싱 방지) ──
+  _cache: {},
+  _initialized: false,
+
   // 로딩 오버레이 제어
   showLoading: function() {
     const loader = document.getElementById('global-loader');
@@ -35,13 +39,9 @@ const API = {
         return this.mockCall(action, params);
       }
     } else {
-      // GAS URL이 없으면 즉시 로컬 모크 DB로 실행
+      // GAS URL이 없으면 즉시 로컬 모크 DB로 실행 (인위적 딜레이 제거)
       this.hideLoading();
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(this.mockCall(action, params));
-        }, 300); // 실제 API 느낌의 짧은 딜레이
-      });
+      return this.mockCall(action, params);
     }
   },
 
@@ -49,11 +49,16 @@ const API = {
   // 로컬 시뮬레이터 (Mock Database) - 브라우저 localStorage 사용
   // ========================================================
   mockDb: {
+    // ── 성능 개선: 캐시 레이어를 통해 localStorage 반복 파싱 방지 ──
     get: function(table) {
+      if (API._cache[table] !== undefined) return API._cache[table];
       const data = localStorage.getItem(`village_mock_${table}`);
-      return data ? JSON.parse(data) : null;
+      const parsed = data ? JSON.parse(data) : null;
+      API._cache[table] = parsed;
+      return parsed;
     },
     set: function(table, data) {
+      API._cache[table] = data; // 캐시 즉시 갱신
       localStorage.setItem(`village_mock_${table}`, JSON.stringify(data));
     },
     init: function() {
@@ -156,7 +161,11 @@ const API = {
 
   // 모크 호출 처리기 (doGet API의 로컬 자바스크립트 모사)
   mockCall: function(action, params) {
-    this.mockDb.init();
+    // ── 성능 개선: 최초 1회만 초기화 실행 ──
+    if (!this._initialized) {
+      this.mockDb.init();
+      this._initialized = true;
+    }
 
     switch (action) {
       case 'initializeDatabase':
